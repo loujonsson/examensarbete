@@ -15,5 +15,4 @@
 receiveFile(File) ->
   File, processHeader(File).
 
-processHeader(File) ->
 
