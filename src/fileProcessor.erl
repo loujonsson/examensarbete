@@ -14,7 +14,7 @@
 -include("main.hrl").
 
 receiveFile(File) ->
-  File, openFile(File).
+  openFile(File).
 
 openFile(File) ->
   Io = case file:open(File, read) of
@@ -31,10 +31,14 @@ readLine(Io) ->
   end.
 
 parse(Data) -> Tokens = string:tokens(Data, ","),
+  printTokens(Tokens),
   case hd(Tokens) of
     "reportingNode" -> io:format("Found header~n");
     _ -> parseData(Tokens)
   end.
+
+printTokens([]) -> [];
+printTokens(Tokens) -> io:format("heeej~n"), hd(Tokens).
 
 parseData([ReportingNode,ReportTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId] = Tokens) ->
   io:format(Tokens),
