@@ -53,13 +53,13 @@ write_testEvent() ->
     %groupPresencePointId = GroupPresencePointId},
   },
   %mnesia:dirty_write(Event),
-  mnesia:dirty_write(EventTest),
-  io:format("hello").
+  mnesia:dirty_write(EventTest).
+  %io:format("hello").
 
 
 write(Event) ->
   mnesia:dirty_write(Event),
-  io:format("hello").
+  "written to db".
 
 
 traverse_table_and_show(Table_name)->

@@ -10,8 +10,12 @@
 -author("lou").
 
 %% API
--export([receiveFile/1]).
+-export([receiveFile/1, addTwo/1, parse/1]).
+%-compile(export_all).
 -include("main.hrl").
+
+
+addTwo(N) -> N+2.
 
 receiveFile(File) ->
   openFile(File).
@@ -19,7 +23,7 @@ receiveFile(File) ->
 openFile(File) ->
   Io = case file:open(File, read) of
          {ok, IoDevice} -> IoDevice;
-         {error, _} -> exit(nofile)
+         {error, ennoent} -> exit(nofile)
        end,
   readLine(Io).
 
@@ -31,17 +35,20 @@ readLine(Io) ->
   end.
 
 parse(Data) -> Tokens = string:tokens(Data, ","),
-  printTokens(Tokens),
+  Tokens,
+  %printTokens(Tokens),
   case hd(Tokens) of
-    "reportingNode" -> io:format("Found header~n");
+    "reportingNode" -> %io:format("Found header~n"),
+    foundHeader;
     _ -> parseData(Tokens)
   end.
 
 printTokens([]) -> [];
-printTokens(Tokens) -> io:format("heeej~n"), hd(Tokens).
+printTokens(Tokens) -> io:format("heeej~n"),
+  hd(Tokens).
 
 parseData([ReportingNode,ReportTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId] = Tokens) ->
-  io:format(Tokens),
+  %io:format(Tokens),
   Event = #event{reportingNode = ReportingNode,
     reportTs = ReportTs,
     eventTs = EventTs,
