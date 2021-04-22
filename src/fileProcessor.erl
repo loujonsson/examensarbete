@@ -33,7 +33,7 @@ readLine(Io) ->
 parse(Data) -> Tokens = string:tokens(Data, ","),
   printTokens(Tokens),
   case hd(Tokens) of
-    "reportingNode" -> io:format("Found header~n");
+    "reportingNode" -> io:format("Found header~n"), scriptInterpreter:receiveHeader(Tokens);
     _ -> parseData(Tokens)
   end.
 
