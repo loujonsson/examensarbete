@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 12. Apr 2021 14:57
 %%%-------------------------------------------------------------------
--module(db).
+-module(nonrelational_db).
 -author("lou").
 
 %% API
