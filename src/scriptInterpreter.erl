@@ -10,13 +10,13 @@
 -author("ant").
 
 %% API
--export([getQuaryFromUser/1, receiveHeader/1]).
+-export([getQuaryFromUser/0, receiveHeader/1]).
 -include("main.hrl").
 
 %start_interpreter() ->
 % receive header from file procesor file
 receiveHeader(Tokens) ->
-  Tokens, getQuaryFromUser(Tokens).
+  %Tokens, getQuaryFromUser(Tokens).
 % displayHeaderFile(),
 % getQuaryFromUser(),
 % callDbWithQuary().
@@ -27,11 +27,10 @@ receiveHeader(Tokens) ->
 
 
 
-getQuaryFromUser(Headerlist) ->
- %how input from user should look like
+getQuaryFromUser()->
+  %how input from user should look like
   %
   %List = [_,_,table_name],
-
   Event = list_to_atom(string:strip(io:get_line("type input:"), right, $\n)),
   %test
   [test1,test2,test3]=string:tokens(Event, ";"),
