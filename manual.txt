@@ -13,14 +13,14 @@ unique - unique occurrences, no duplicated data
 ATTRIBUTES
 
 gender
-Default: 0 AND 1 AND 2
+Default: gender = 0, 1, 2
 
 0 = unknown
 1 = male
 2 = female
 
 ageGroup
-Default: 0 AND 1 AND 2 AND 3 AND 4 AND 5 AND 6
+Default: ageGroup = 0, 1, 2, 3, 4, 5, 6
 
 0 = unknown
 1 = 18-24
