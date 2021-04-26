@@ -10,6 +10,7 @@
 -author("lou").
 
 %% API
--export([receiveDone/0]).
+-export([receiveDone/1]).
 
-receiveDone() -> io:format("received done.").
+receiveDone(Query) -> io:format("received done.").
+  %io:format(Query).

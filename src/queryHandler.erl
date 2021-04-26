@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([receiveValidCommand/1, queryInit/0, fetchQuery/1]).
+-export([receiveValidCommand/1, queryInit/0, fetchQuery/1, showTable/0]).
 
 %-record(query, {gender, ageGroup}).
 
@@ -27,6 +27,8 @@ fetchQuery(LookupArg) ->
   %[{_, Data}]
   ets:lookup(query, LookupArg).
 
+showTable() -> ets:all().
+
 
 receiveValidCommand(Input) ->
   Input,
@@ -36,7 +38,9 @@ receiveValidCommand(Input) ->
 getAttribute(Tokens) ->
   Attribute = hd(Tokens),
   case Attribute of
-    "done" -> outputFileProcessor:receiveDone();
+    "done" ->
+      Query = formatQuery(),
+      outputFileProcessor:receiveDone();
     "reset" -> resetAllQueries();
     _ -> setNewAttributeQuery(Tokens)
   end.
@@ -62,5 +66,7 @@ setNewAttributeQuery(Tokens) ->
       ets:insert(query, {ageGroup, list_to_tuple(Elements)})
   end.
 
-
+formatQuery() ->
+  List = ets:tab2list(query),
+  [{ageGroup,AgeTypes},{gender,GenderTypes}] = List.
 
