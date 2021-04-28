@@ -12,5 +12,22 @@
 %% API
 -export([receiveDone/1]).
 
-receiveDone(Query) -> io:format("received done.").
+receiveDone(Query) -> io:format("received done."),
+  [{ageGroup,AgeTypes},{zipCode,ZipTypes},{gender,GenderTypes}] = Query,
+  getElementsFromList(tuple_to_list(ZipTypes)).
   %io:format(Query).
+
+getElementsFromList([]) -> [];
+getElementsFromList([H]) -> H,
+  case H of
+    "zipCode" -> ignore;
+    _ -> getDataFromDb(H)
+  end;
+getElementsFromList([_| T]) ->
+  getElementsFromList(T).
+  %Head = lists:nth(1, List),
+  %getElementsFromList(Head),
+  %List2 = lists:delete(Head, List),
+  %getElementsFromList(List2).
+
+getDataFromDb(ZipCode) -> Data = db_nonrelational:select(event, ZipCode).
