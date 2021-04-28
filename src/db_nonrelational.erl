@@ -10,8 +10,10 @@
 -author("lou").
 
 %% API
--export([install/1, write/1, write_testEvent/0, traverse_table_and_show/1, select/2]).
+-export([install/1, write/1, write_testEvent/0, traverse_table_and_show/1, select/2, select_distinct/1]).
 -include("main.hrl").
+
+-include_lib("stdlib/include/qlc.hrl").
 
 install(Nodes) ->
   ok = mnesia:create_schema(Nodes),
@@ -94,6 +96,22 @@ select(Table_name, ZipCode) ->
                   _ = '_'
                 },
   mnesia:dirty_select(Table_name, [{MatchHead, [], ['$6']}]).
+
+% QLC query list comprehensions
+select_distinct(ZipCode) ->
+  QH = qlc:q(
+    [{HashedImsi, Z} ||
+      #event{ hashedImsi = HashedImsi,
+              %crmGender = 1,
+              %crmAgeGroup = 2,
+              crmZipCode = Z,
+              _ = '_'
+              %presencePointId = PresencePointId,
+              %groupPresencePointId = GroupPresencePointId},
+  } <- mnesia:table(event), Z == ZipCode]),
+  F = fun() -> qlc:eval(QH) end,
+  {atomic, Result} = mnesia:transaction(F),
+  Result.
 
 
 traverse_table_and_show(Table_name)->
