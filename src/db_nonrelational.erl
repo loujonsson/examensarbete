@@ -6,11 +6,11 @@
 %%% @end
 %%% Created : 12. Apr 2021 14:57
 %%%-------------------------------------------------------------------
--module(db).
+-module(db_nonrelational).
 -author("lou").
 
 %% API
--export([install/1, write/1, write_testEvent/0, traverse_table_and_show/1]).
+-export([install/1, write/1, write_testEvent/0, traverse_table_and_show/1, select/2]).
 -include("main.hrl").
 
 install(Nodes) ->
@@ -61,6 +61,40 @@ write(Event) ->
   mnesia:dirty_write(Event),
   io:format("hello").
 
+select(Table_name, ZipCode) ->
+  MatchHead = #event{%reportingNode = '$1',
+                  %reportTs = '$2',
+                  %eventTs = '$3',
+                  %eventType = '$4',
+                  %hMcc = '$5',
+                  %hMnc = '$6',
+                  hashedImsi = '$6',
+                  vMcc = '$7',
+                  vMnc = '$8',
+                  rat = '$9',
+                  cellName = '$10',
+                  %gsmLac = '$11',
+                  %gsmCid = '$12',
+                  %umtsLac = '$12',
+                  %umtsSac = '$13',
+                  %umtsRncId = '$14',
+                  %umtsCi = '$15',
+                  lteEnodeBId = '$16',
+                  lteCi = '$17',
+                  cellPortionId = '$18',
+                  %locationEstimateShape = '$19',
+                  %locationEstimateLat = '$20',
+                  %locationEstimateLon = '$21',
+                  %locationEstimateRadius = '$22',
+                  crmGender = '$23',
+                  crmAgeGroup = '$24',
+                  crmZipCode = ZipCode,
+                  %presencePointId = '$25',
+                  %groupPresencePointId = '$26'
+                  _ = '_'
+                },
+  mnesia:dirty_select(Table_name, [{MatchHead, [], ['$6']}]).
+
 
 traverse_table_and_show(Table_name)->
   Iterator =  fun(Rec,_)->
@@ -73,3 +107,5 @@ traverse_table_and_show(Table_name)->
       Exec = fun({Fun,Tab}) -> mnesia:foldl(Fun, [],Tab) end,
       mnesia:activity(transaction,Exec,[{Iterator,Table_name}],mnesia_frag)
   end.
+
+

@@ -12,6 +12,7 @@
 %% API
 -export([start_interpreter/0,getQuaryFromUser/0,receiveHeader/1
 ]).
+
 -include("main.hrl").
 
 start_interpreter() ->
@@ -53,7 +54,6 @@ testcheckValidAttribute(Attribute,Number) ->
       false
 
   end.
-
 
 
 %checkValidAttribute(Attribute) ->

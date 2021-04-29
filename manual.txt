@@ -1,0 +1,36 @@
+COMMANDS
+reset - resets all parameters for current program run.
+done - gives an output file with all specified parameters that have been set.
+exit - exit the program.
+
+DATA
+Default: all
+
+all - all occurrences
+unique - unique occurrences, no duplicated data
+
+
+ATTRIBUTES
+
+gender
+Default: gender = 0, 1, 2
+
+0 = unknown
+1 = male
+2 = female
+
+ageGroup
+Default: ageGroup = 0, 1, 2, 3, 4, 5, 6
+
+0 = unknown
+1 = 18-24
+2 = 25-34
+3 = 35-44
+4 = 45-54
+5 = 55-64
+6 = 65+
+
+zip code
+default: All
+Specified string consisting of a zip code of the requested users
+
