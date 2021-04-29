@@ -10,14 +10,14 @@
 -author("ant").
 
 %% API
--export([start_interpreter/0,getQuaryFromUser/0,receiveHeader/1
+-export([initProgram/0
 ]).
 
 -include("main.hrl").
 
-start_interpreter() ->
+%start_interpreter() ->
 % receive header from file procesor file
-receiveHeader(headList).
+%receiveHeader(headList).
 % displayHeaderFile(),
 % getQuaryFromUser(),
 % callDbWithQuary().
@@ -25,31 +25,42 @@ receiveHeader(headList).
 % done(),
 % exit(),
 
+initProgram() -> io:format("This is a test start of the program"),
+  Test = queryHandler:queryInit(),
+  io:format(Test),
+  io:format("2n Hello"),
+  getQueryFromUser().
 
-receiveHeader(headList) ->
-    io:format(headList).
+
+%receiveHeader(headList) ->
+%    io:format(headList).
 % need to exeption if not = is added, and make done. work so that it jumps out of program
-getQuaryFromUser() ->
+getQueryFromUser() ->
   Input = io:get_line("Set values on attributes~n:"),
   Tokens = string:tokens(Input, ";=\n."),
-  case testcheckValidAttribute(hd(Tokens),list_to_integer(lists:last(Tokens))) of
+  case testCheckValidAttribute(hd(Tokens),list_to_integer(lists:last(Tokens))) of
    true ->
-      io:format("send data to database~n");
+      queryHandler:receiveValidCommand(Input),
+     getQueryFromUser();
     false->
-        io:format("invalid input~n")
-  end,
-    getQuaryFromUser().
+      io:format("invalid command"),
+      getQuaryFromUser();
+    off ->
+    io:format("powering off the program")
 
-testcheckValidAttribute(Attribute,Number) ->
+  end.
+
+
+testCheckValidAttribute(Attribute,Number) ->
   case Attribute of
     "zipCode" ->
-      lists:member(Number, lists:seq(0,12));
+      lists:member(Number, lists:seq(0,99999));
     "gender" ->
       lists:member(Number, lists:seq(0,4));
     "ageGroup" ->
       lists:member(Number, lists:seq(0,3));
     "done" ->
-      exit(done);
+      off;
     _ ->
       false
 

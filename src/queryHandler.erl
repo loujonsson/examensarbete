@@ -32,6 +32,7 @@ showTable() -> ets:all().
 
 
 receiveValidCommand(Input) ->
+  io:format(Input),
   Input,
   Tokens = string:tokens(Input, " ;="),
   getAttribute(Tokens).
@@ -67,7 +68,7 @@ setNewAttributeQuery(Tokens) ->
       ets:insert(query, {ageGroup, list_to_tuple(Elements)});
     "zipCode" ->
       Elements = lists:delete(zipCode, Tokens),
-      ets:insert(query, {zipCode, list_to_tuple(Elements)})
+      ets:insert(query, {zipCode, list_to_tuple(Elements)}),
   end.
 
 formatQuery() ->
