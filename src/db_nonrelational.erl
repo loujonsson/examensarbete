@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([install/1, write/1, write_testEvent/0, traverse_table_and_show/1, select/2, select_distinct/1]).
+-export([install/1, write/1, write_testEvent/0, traverse_table_and_show/1, select/2, select_all/0, select_distinct/1]).
 -include("main.hrl").
 
 -include_lib("stdlib/include/qlc.hrl").
@@ -98,21 +98,54 @@ select(Table_name, ZipCode) ->
   mnesia:dirty_select(Table_name, [{MatchHead, [], ['$6']}]).
 
 % QLC query list comprehensions
-select_distinct(ZipCode) ->
-  QH = qlc:q(
-    [{HashedImsi, Z} ||
-      #event{ hashedImsi = HashedImsi,
+%select_distinct(ZipCode) ->
+%  QH = qlc:q(
+%    [HashedImsi ||
+%      #event{ hashedImsi = HashedImsi,
               %crmGender = 1,
               %crmAgeGroup = 2,
-              crmZipCode = Z,
-              _ = '_'
+%              crmZipCode = Z,
+%              _ = '_'
               %presencePointId = PresencePointId,
               %groupPresencePointId = GroupPresencePointId},
-  } <- mnesia:table(event), Z == ZipCode]),
-  F = fun() -> qlc:eval(QH) end,
-  {atomic, Result} = mnesia:transaction(F),
-  Result.
+%  } <- mnesia:table(event), Z =:= ZipCode], {unique,true}),
+%  F = fun() -> qlc:eval(QH) end,
+%  {atomic, Result} = mnesia:transaction(F),
+%  Result.
 
+select_all() ->
+  {atomic, Data} = mnesia:transaction(
+    fun() ->
+      qlc:eval(
+        qlc:q([X || X <- mnesia:table(event)], {unique, true})
+      )
+    end
+  ),
+  Data.
+
+select_distinct(ZipCode) ->
+  MatchHead = #event{%reportingNode = '$1',
+    hashedImsi = '$6',
+    vMcc = '$7',
+    vMnc = '$8',
+    rat = '$9',
+    cellName = '$10',
+    crmGender = '$23',
+    crmAgeGroup = '$24',
+    crmZipCode = '$25',
+    _ = '_'
+  },
+
+  Guard = {'=', '$25', ZipCode},
+  Result = '$6',
+  {atomic, Data} = mnesia:transaction(
+    fun() ->
+      qlc:eval(
+        qlc:q([X || X <- mnesia:select(event, {MatchHead, [Guard], [Result]})], {unique, true})
+      )
+    end
+  ),
+  Data.
 
 traverse_table_and_show(Table_name)->
   Iterator =  fun(Rec,_)->
