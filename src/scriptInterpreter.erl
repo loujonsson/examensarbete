@@ -10,13 +10,13 @@
 -author("ant").
 
 %% API
--export([getQuaryFromUser/1, receiveHeader/1]).
+-export([start_interpreter/0,getQuaryFromUser/0,receiveHeader/1
+]).
 -include("main.hrl").
 
-%start_interpreter() ->
+start_interpreter() ->
 % receive header from file procesor file
-receiveHeader(Tokens) ->
-  Tokens, getQuaryFromUser(Tokens).
+receiveHeader(headList).
 % displayHeaderFile(),
 % getQuaryFromUser(),
 % callDbWithQuary().
@@ -25,24 +25,47 @@ receiveHeader(Tokens) ->
 % exit(),
 
 
+receiveHeader(headList) ->
+    io:format(headList).
+% need to exeption if not = is added, and make done. work so that it jumps out of program
+getQuaryFromUser() ->
+  Input = io:get_line("Set values on attributes~n:"),
+  Tokens = string:tokens(Input, ";=\n."),
+  case testcheckValidAttribute(hd(Tokens),list_to_integer(lists:last(Tokens))) of
+   true ->
+      io:format("send data to database~n");
+    false->
+        io:format("invalid input~n")
+  end,
+    getQuaryFromUser().
+
+testcheckValidAttribute(Attribute,Number) ->
+  case Attribute of
+    "zipCode" ->
+      lists:member(Number, lists:seq(0,12));
+    "gender" ->
+      lists:member(Number, lists:seq(0,4));
+    "ageGroup" ->
+      lists:member(Number, lists:seq(0,3));
+    "done" ->
+      exit(done);
+    _ ->
+      false
+
+  end.
 
 
-getQuaryFromUser(Headerlist) ->
- %how input from user should look like
-  %
-  %List = [_,_,table_name],
 
-  Event = list_to_atom(string:strip(io:get_line("type input:"), right, $\n)),
-  %test
-  [test1,test2,test3]=string:tokens(Event, ";"),
+%checkValidAttribute(Attribute) ->
+%  checklist = string:tokens("zipCode,gender,ageGroup,done", ","),
+%  case lists:member(Attribute,checklist) of
+%    true -> valid_input;
+%    false -> invalid_input
+%  end.
 
-  io:format("\n"),
-  io:format(test1),
-  io:format("\n"),
-  io:format("\n"),
-  io:format(test2),
-  io:format("\n"),
-  io:format("\n"),
-  io:format(test3),
-  io:format("\n").
-%db:traverse_table_and_show(test1).
+%checkValidAttribute(Attribute) ->
+% case re:run(file,Attribute ) of
+%  match -> true;
+% nomatch -> false;
+%_ ->
+% end.
