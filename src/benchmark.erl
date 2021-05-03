@@ -13,15 +13,28 @@
 -export([mainStatictics/0,mainTimer/0,timeForDatabase/0]).
 mainTimer() ->
   Test = timer:tc(?MODULE, timeForDatabase,[]),
-  io:format("took this amount of time  ~p~n",[Test]),
-  ok.
+  io:format("timer:took this amount of time  ~p~n",[Test]).
 mainStatictics() ->
   statistics(runtime),
   timeForDatabase(),
   {_,Time_Since_Last_Call} = statistics(runtime),
   Time_In_Microsecounds=Time_Since_Last_Call*1000,
-  io:format("took this amount of time ~p~n",[Time_In_Microsecounds]),
-  ok.
+  Therun=io:format("statistics :took this amount of time ~p~n",[Time_In_Microsecounds]).
+  List:append([],[Therun]).
+
+
 timeForDatabase() ->
   %database read/write code hereh
   main:run("input.txt").
+
+
+
+
+average(X) ->
+  average(X, 0, 0).
+
+average([H|T], Length, Sum) ->
+  average(T, Length + 1, Sum + H);
+
+average([], Length, Sum) ->
+  Sum / Length.

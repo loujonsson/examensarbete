@@ -12,4 +12,6 @@
 %% API
 -export([run/1]).
 
-run(File) -> fileProcessor:receiveFile(File).
+run(File) ->
+  mnesia:start(),
+  fileProcessor:receiveFile(File).
