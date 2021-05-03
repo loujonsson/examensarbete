@@ -26,7 +26,8 @@ openFile(File) ->
 readLine(Io) ->
   case file:read_line(Io) of
     {ok, Data} -> parse(Data), readLine(Io);
-    eof -> exit(eof);
+    eof -> "eof";
+      %exit(eof);
     {error, _} -> exit(errorreadline)
   end.
 
@@ -38,7 +39,7 @@ parse(Data) -> Tokens = string:tokens(Data, ","),
   end.
 
 printTokens([]) -> [];
-printTokens(Tokens) -> io:format("heeej~n"), hd(Tokens).
+printTokens(Tokens) -> hd(Tokens).
 
 parseData([ReportingNode,ReportTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId] = Tokens) ->
   io:format(Tokens),

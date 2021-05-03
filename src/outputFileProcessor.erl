@@ -30,4 +30,10 @@ getElementsFromList([_| T]) ->
   %List2 = lists:delete(Head, List),
   %getElementsFromList(List2).
 
-getDataFromDb(ZipCode) -> Data = db_nonrelational:select(event, ZipCode).
+getDataFromDb(ZipCode) ->
+  Data = db_nonrelational:select(event, ZipCode),
+  countOccurrences(Data).
+
+countOccurrences(Data) ->
+  Tokens = string:tokens(Data,","),
+  length(Tokens).
