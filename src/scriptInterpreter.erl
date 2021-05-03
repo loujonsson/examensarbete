@@ -45,8 +45,7 @@ getQueryFromUser() ->
       io:format("invalid command~n"),
       getQueryFromUser();
     off ->
-      queryHandler:receiveValidCommand("done."),
-      io:format("powering off the program~n")
+      queryHandler:receiveValidCommand("done")
   end.
 
 testCheckValidAttribute([Element]) ->
