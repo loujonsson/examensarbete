@@ -20,12 +20,14 @@
 %receiveHeader(headList).
 % displayHeaderFile(),
 % getQuaryFromUser(),
-% callDbWithQuary().
+% call
+% DbWithQuary().
 % reset(),
 % done(),
 % exit(),
 
 initProgram() ->
+  mnesia:start(),
   queryHandler:queryInit(),
   getQueryFromUser().
 %receiveHeader(headList) ->
@@ -43,7 +45,7 @@ getQueryFromUser() ->
       io:format("invalid command~n"),
       getQueryFromUser();
     off ->
-      %queryHandler:receiveValidCommand("done"),
+      queryHandler:receiveValidCommand("done."),
       io:format("powering off the program~n")
   end.
 

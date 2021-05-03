@@ -55,13 +55,11 @@ write_testEvent() ->
     %groupPresencePointId = GroupPresencePointId},
   },
   %mnesia:dirty_write(Event),
-  mnesia:dirty_write(EventTest),
-  io:format("hello").
+  mnesia:dirty_write(EventTest).
 
 
 write(Event) ->
-  mnesia:dirty_write(Event),
-  io:format("hello").
+  mnesia:dirty_write(Event).
 
 select(Table_name, ZipCode) ->
   MatchHead = #event{%reportingNode = '$1',

@@ -33,7 +33,7 @@ showTable() -> ets:all().
 
 receiveValidCommand(Input) ->
   Input,
-  Tokens = string:tokens(Input, " ;="),
+  Tokens = string:tokens(Input, " .;="),
   getAttribute(Tokens).
 
 getAttribute(Tokens) ->
