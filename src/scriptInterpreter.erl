@@ -54,6 +54,10 @@ testCheckValidAttribute([Element]) ->
     "done" ->
       %queryHandler:receiveValidCommand("done"),
       off;
+    "total" ->
+      true;
+    "unique" ->
+      true;
     _ -> false
   end;
 testCheckValidAttribute(Tokens) ->
