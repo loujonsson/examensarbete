@@ -10,7 +10,7 @@
 -author("ant").
 
 %% API
--export([initProgram/0
+-export([initProgram/0,getQueryFromUser/0
 ]).
 
 -include("main.hrl").
@@ -25,33 +25,38 @@
 % done(),
 % exit(),
 
-initProgram() -> io:format("This is a test start of the program"),
-  Test = queryHandler:queryInit(),
-  io:format(Test),
-  io:format("2n Hello"),
+initProgram() ->
+  queryHandler:queryInit(),
   getQueryFromUser().
-
-
 %receiveHeader(headList) ->
 %    io:format(headList).
-% need to exeption if not = is added, and make done. work so that it jumps out of program
+
 getQueryFromUser() ->
-  Input = io:get_line("Set values on attributes~n:"),
+  Input = io:get_line(io:format("Set values on attributes~n")),
   Tokens = string:tokens(Input, ";=\n."),
-  case testCheckValidAttribute(hd(Tokens),list_to_integer(lists:last(Tokens))) of
+  case testCheckValidAttribute(Tokens) of
    true ->
-      queryHandler:receiveValidCommand(Input),
+     io:format("valid input~n"),
+     % queryHandler:receiveValidCommand(Input),
      getQueryFromUser();
     false->
-      io:format("invalid command"),
-      getQuaryFromUser();
+      io:format("invalid command~n"),
+      getQueryFromUser();
     off ->
-    io:format("powering off the program")
-
+      %queryHandler:receiveValidCommand("done"),
+      io:format("powering off the program~n")
   end.
 
-
-testCheckValidAttribute(Attribute,Number) ->
+testCheckValidAttribute([Element]) ->
+  case Element of
+    "done" ->
+      %queryHandler:receiveValidCommand("done"),
+      off;
+    _ -> false
+  end;
+testCheckValidAttribute(Tokens) ->
+  Attribute=hd(Tokens),
+  Number=list_to_integer(lists:last(Tokens)),
   case Attribute of
     "zipCode" ->
       lists:member(Number, lists:seq(0,99999));
@@ -59,11 +64,8 @@ testCheckValidAttribute(Attribute,Number) ->
       lists:member(Number, lists:seq(0,4));
     "ageGroup" ->
       lists:member(Number, lists:seq(0,3));
-    "done" ->
-      off;
     _ ->
       false
-
   end.
 
 
