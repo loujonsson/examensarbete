@@ -35,5 +35,6 @@ getDataFromDb(ZipCode) ->
   countOccurrences(Data).
 
 countOccurrences(Data) ->
-  Tokens = string:tokens(Data,","),
-  length(Tokens).
+  %Tokens = string:tokens(Data,","),
+  %length(Tokens).
+  length(Data).
