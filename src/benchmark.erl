@@ -10,18 +10,18 @@
 -author("ant").
 
 %% API
--export([]).
+-export([mainStatictics/0,mainTimer/0,timeForDatabase/0]).
 mainTimer() ->
   Test = timer:tc(?MODULE, timeForDatabase,[]),
-  io:format("~p~n",[Test]),
+  io:format("took this amount of time  ~p~n",[Test]),
   ok.
 mainStatictics() ->
   statistics(runtime),
   timeForDatabase(),
   {_,Time_Since_Last_Call} = statistics(runtime),
   Time_In_Microsecounds=Time_Since_Last_Call*1000,
-  io:format("~p~n",[Time_In_Microsecounds]),
+  io:format("took this amount of time ~p~n",[Time_In_Microsecounds]),
   ok.
 timeForDatabase() ->
   %database read/write code hereh
-io:format("this is a test").
+  main:run("input.txt").
