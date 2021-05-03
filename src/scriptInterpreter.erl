@@ -37,7 +37,7 @@ getQueryFromUser() ->
   case testCheckValidAttribute(Tokens) of
    true ->
      io:format("valid input~n"),
-     % queryHandler:receiveValidCommand(Input),
+     queryHandler:receiveValidCommand(Input),
      getQueryFromUser();
     false->
       io:format("invalid command~n"),
