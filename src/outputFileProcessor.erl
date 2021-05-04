@@ -29,9 +29,9 @@ writeToFile(IoDevice) ->
   file:write_file("outputFileTest.txt", Data).
 
 formatData() ->
-  Header = "reportingNode,reportTs,eventType,counterValue,counterType,periodStartTs,periodStopTs,statId,statIndex,presencePointId,presencePointIdType,minPresenceNo,hMcc,hMnc,crmGender,crmAgeGroup,crmZipCode,maxPresenceNo,presencePointId2,presencePointId2Type,minDwellTimeCrit,maxDwellTimeCrit,subCat,dayCat,timeCatCRLF",
   Row1 = "testing",
-  Data = string:join([Header, Row1], "\n"),
+  Row2 = "test data 2",
+  Data = string:join([Row1, Row2], "\n"),
   Data.
 
 
