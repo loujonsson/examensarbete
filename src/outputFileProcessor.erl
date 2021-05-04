@@ -12,8 +12,8 @@
 %% API
 -export([receiveDone/1]).
 
-receiveDone(Query) -> io:format("received done."),
-  [{ageGroup,AgeTypes},{zipCode,ZipTypes},{gender,GenderTypes}] = Query,
+receiveDone(Query) -> io:format("received done.~n"),
+  [{"ageGroup",AgeTypes},{"zipCode",ZipTypes},{"gender",GenderTypes}] = Query,
   getElementsFromList(tuple_to_list(ZipTypes)).
   %io:format(Query).
 
@@ -38,3 +38,5 @@ countOccurrences(Data) ->
   %Tokens = string:tokens(Data,","),
   %length(Tokens).
   length(Data).
+
+%%% output file grejer:
