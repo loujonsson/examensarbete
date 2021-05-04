@@ -10,33 +10,36 @@
 -author("lou").
 
 %% API
--export([receiveDone/1]).
+-export([generateOutputFile/0]).
 
-receiveDone(Query) -> io:format("received done.~n"),
-  [{"ageGroup",AgeTypes},{"zipCode",ZipTypes},{"gender",GenderTypes}] = Query,
-  getElementsFromList(tuple_to_list(ZipTypes)).
-  %io:format(Query).
-
-getElementsFromList([]) -> [];
-getElementsFromList([H]) -> H,
-  case H of
-    "zipCode" -> ignore;
-    _ -> getDataFromDb(H)
-  end;
-getElementsFromList([_| T]) ->
-  getElementsFromList(T).
-  %Head = lists:nth(1, List),
-  %getElementsFromList(Head),
-  %List2 = lists:delete(Head, List),
-  %getElementsFromList(List2).
-
-getDataFromDb(ZipCode) ->
-  Data = db_nonrelational:select(event, ZipCode),
-  countOccurrences(Data).
-
-countOccurrences(Data) ->
-  %Tokens = string:tokens(Data,","),
-  %length(Tokens).
-  length(Data).
 
 %%% output file grejer:
+generateOutputFile() ->
+  openFile(read).
+
+openFileRead() ->
+  Io = case file:open("outputFileTest.txt", read) of
+         {ok, IoDevice} -> IoDevice;
+         {error, _} -> exit(nofile)
+       end,
+  readHeader(Io).
+
+openFile(Mode) ->
+  Io = case file:open("outputFileTest.txt", write) of
+    {ok, IoDevice} -> IoDevice;
+    {error, _} -> exit(errorOpenFile)
+  end,
+  writeToFile(Io).
+
+writeToFile(IoDevice) ->
+  Data = formatData(),
+  file:write_file("outputFileTest.txt", Data).
+
+formatData() ->
+  Row1 = "testing",
+  Row2 = "test data 2",
+  Data = string:join([Row1, Row2], "\n"),
+  Data.
+
+
+
