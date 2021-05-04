@@ -26,15 +26,15 @@ openFile(File) ->
 readLine(Io) ->
   case file:read_line(Io) of
     {ok, Data} -> parse(Data), readLine(Io);
-    eof -> "eof";
+    eof -> eof;
       %exit(eof);
     {error, _} -> exit(errorreadline)
   end.
 
 parse(Data) -> Tokens = string:tokens(Data, ","),
-  printTokens(Tokens),
+  %printTokens(Tokens),
   case hd(Tokens) of
-    "reportingNode" -> io:format("Found header~n");
+    "reportingNode" -> header;%io:format("Found header~n");
     _ -> parseData(Tokens)
   end.
 
@@ -42,7 +42,7 @@ printTokens([]) -> [];
 printTokens(Tokens) -> hd(Tokens).
 
 parseData([ReportingNode,ReportTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId] = Tokens) ->
-  io:format(Tokens),
+  %io:format(Tokens),
   Event = #event{reportingNode = ReportingNode,
     reportTs = ReportTs,
     eventTs = EventTs,

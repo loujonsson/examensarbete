@@ -15,9 +15,16 @@
 
 %%% output file grejer:
 generateOutputFile() ->
-  openFile().
+  openFile(read).
 
-openFile() ->
+openFileRead() ->
+  Io = case file:open("outputFileTest.txt", read) of
+         {ok, IoDevice} -> IoDevice;
+         {error, _} -> exit(nofile)
+       end,
+  readHeader(Io).
+
+openFile(Mode) ->
   Io = case file:open("outputFileTest.txt", write) of
     {ok, IoDevice} -> IoDevice;
     {error, _} -> exit(errorOpenFile)
