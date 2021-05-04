@@ -27,7 +27,6 @@
 % exit(),
 
 initProgram() ->
-  mnesia:start(),
   queryHandler:queryInit(),
   getQueryFromUser().
 %receiveHeader(headList) ->
@@ -45,11 +44,11 @@ getQueryFromUser() ->
       io:format("invalid command~n"),
       getQueryFromUser();
     reset ->
-      queryHandler:receiveValidCommand("reset."),
-      io:format("reset program ~n");
+      io:format("reset program ~n"),
+      queryHandler:receiveValidCommand("reset");
     off ->
-      queryHandler:receiveValidCommand("done."),
-      io:format("exit program~n")
+      io:format("exit program"),
+      queryHandler:receiveValidCommand("done")
   end.
 
 testCheckValidAttribute([Element]) ->

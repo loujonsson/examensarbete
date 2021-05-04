@@ -13,5 +13,4 @@
 -export([run/1]).
 
 run(File) ->
-  mnesia:start(),
   fileProcessor:receiveFile(File).

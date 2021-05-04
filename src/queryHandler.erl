@@ -40,6 +40,7 @@ getAttribute(Tokens) ->
   case Attribute of
     "done" ->
       Query = formatQuery(),
+      resetAllQueries(),
       outputFileProcessor:receiveDone(Query);
     "reset" -> resetAllQueries();
     _ -> setNewAttributeQuery(Tokens)
@@ -47,8 +48,9 @@ getAttribute(Tokens) ->
 
 % hard coded reset queries
 resetAllQueries() ->
-  io:format("shall reset all queries in output db").
-  %CurrentQuery = queryInit().
+  io:format("shall reset all queries in output db~n"),
+  ets:delete(query),
+  queryInit().
 
 % ide
 % köra query:
@@ -63,5 +65,5 @@ setNewAttributeQuery(Tokens) ->
 
 formatQuery() ->
   List = ets:tab2list(query),
-  [{ageGroup,AgeTypes},{zipCode,ZipTypes},{gender,GenderTypes}] = List.
+  [{"ageGroup",AgeTypes},{"zipCode",ZipTypes},{"gender",GenderTypes}] = List.
 
