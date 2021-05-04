@@ -11,6 +11,7 @@
 
 %% API
 -export([test2/1,test3/1,bench/0,test1/1]).
+%test1-3 are different tests of counting time
 %not working - no list
 test1(Filename) ->
   Test = timer:tc(?MODULE, main:run(Filename),[]),
