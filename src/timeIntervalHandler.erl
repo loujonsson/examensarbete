@@ -10,11 +10,12 @@
 -author("ant").
 
 %% API
--export([timeHandler/1]).
+-export([repeatedOutputFile/3]).
 
+%will handle timer for intevall reapeat out put for the ouPutfile.
+repeatedOutputFile(startTime,intervalTime,stopTime) ->
+  erlang:send_after(intervalTime, main:run("input1000.txt")).
 
-timeHandler(Time) ->
-  erlang:send_after(Time, main:run("input1000.txt")),
-  timeHandler(Time).
-
-
+%will handle future call for sending outPutfile.
+featureHandler(Time) ->
+  io:format("test").
