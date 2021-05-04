@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([receiveValidCommand/1, queryInit/0, fetchQuery/1, showTable/0]).
+-export([receiveValidCommand/1, queryInit/0, fetchEts/2, showTable/0, fetchEtsData/2]).
 
 %-record(query, {gender, ageGroup}).
 
@@ -20,16 +20,27 @@
 
 queryInit() ->
   ets:new(query, [named_table, public, set, {keypos, 1}]),
-  ets:insert(query, {"gender", {0,1,2}}),
-  ets:insert(query, {"ageGroup", {0,1,2,3,4,5,6}}),
-  ets:insert(query, {"zipCode", {}}).
+  ets:insert(query, {"gender", {}}), %{0,1,2}
+  ets:insert(query, {"ageGroup", {}}), %{0,1,2,3,4,5,6}
+  ets:insert(query, {"zipCode", {}}),
 
-fetchQuery(LookupArg) ->
+  ets:new(attributes, [named_table, public, set, {keypos, 1}]),
+  ets:insert(attributes, {"counterType", {"0"}}),
+  ets:insert(attributes, {"counterValue", {"0"}}).
+
+fetchEts(Name, LookupArg) ->
   %[{_, Data}]
-  ets:lookup(query, LookupArg).
+  ets:lookup(Name, LookupArg).
+
+fetchEtsData(Name, LookupArg) ->
+  List = ets:lookup(Name, LookupArg),
+  {_, Element} = hd(List),
+  case Element of
+    {Data} -> Data;
+    _ -> ""
+  end.
 
 showTable() -> ets:all().
-
 
 receiveValidCommand(Input) ->
   Tokens = string:tokens(Input, " \n.;="),
@@ -40,8 +51,9 @@ getAttribute(Tokens) ->
   case Attribute of
     "done" ->
       Query = formatQuery(),
-      resetAllQueries(),
-      receiveDone(Query);
+      %resetAllQueries(),
+      receiveDone(Query),
+      outputFileProcessor:generateOutputFile();
     "reset" -> resetAllQueries();
     _ -> setNewAttributeQuery(Tokens)
   end.
@@ -50,6 +62,7 @@ getAttribute(Tokens) ->
 resetAllQueries() ->
   io:format("shall reset all queries in output db~n"),
   ets:delete(query),
+  ets:delete(attributes),
   queryInit().
 
 % ide
@@ -64,8 +77,10 @@ setNewAttributeQuery(Tokens) ->
   ets:insert(query, {Attribute, list_to_tuple(Elements)}).
 
 formatQuery() ->
-  List = ets:tab2list(query),
-  [{"ageGroup",AgeTypes},{"zipCode",ZipTypes},{"gender",GenderTypes}] = List.
+  %List =
+  ets:lookup(query, "zipCode"),
+    ets:tab2list(query).
+  %[{"ageGroup",AgeTypes},{"zipCode",ZipTypes},{"gender",GenderTypes}] = List.
 
 
 %before in outputFileProcessor
@@ -79,7 +94,7 @@ getElementsFromList([H]) -> H,
   case H of
     "zipCode" -> ignore;
     _ -> getDataFromDb(H)
-  end,
+  end;
 getElementsFromList([_| T]) ->
   getElementsFromList(T).
 %Head = lists:nth(1, List),
@@ -94,7 +109,10 @@ getDataFromDb(ZipCode) ->
 countOccurrences(Data) ->
   %Tokens = string:tokens(Data,","),
   %length(Tokens).
-  TotalOccurrences = length(Data),
-  ets:insert(query, {"totalOccurrences", TotalOccurrences}).
+  Length = length(Data),
+  TotalOccurrences = to_string(Length),
+  ets:insert(attributes, {"counterValue", {TotalOccurrences}}).
 
+to_string(Number) ->
+  lists:flatten(io_lib:format("~p", [Number])).
 

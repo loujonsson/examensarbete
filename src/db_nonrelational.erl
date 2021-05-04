@@ -62,7 +62,7 @@ write(Event) ->
   mnesia:dirty_write(Event).
 
 select(Table_name, ZipCode) ->
-  MatchHead = #event{%reportingNode = '$1',
+  MatchHead = #event{reportingNode = '$1',
                   %reportTs = '$2',
                   %eventTs = '$3',
                   %eventType = '$4',
@@ -93,7 +93,7 @@ select(Table_name, ZipCode) ->
                   %groupPresencePointId = '$26'
                   _ = '_'
                 },
-  mnesia:dirty_select(Table_name, [{MatchHead, [], ['$6']}]).
+  mnesia:dirty_select(Table_name, [{MatchHead, [], ['$1']}]).
 
 % QLC query list comprehensions
 %select_distinct(ZipCode) ->
