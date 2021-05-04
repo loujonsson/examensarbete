@@ -19,11 +19,15 @@ mainStatictics() ->
   timeForDatabase(),
   {_,Time_Since_Last_Call} = statistics(runtime),
   Time_In_Microsecounds=Time_Since_Last_Call*1000,
-  Therun=io:format("statistics :took this amount of time ~p~n",[Time_In_Microsecounds]).
+%  io:format(" ~p ~p ~n",["1000","10000","100000","1000000","10000000"]),
+  io:format(" time for run was : ~n"),
+  io:format(" ~p ~n",[Time_In_Microsecounds]).
+
+
 
 timeForDatabase() ->
   %database read/write code hereh
-  main:run("input.txt").
+  main:run("input1000.txt").
 
 
 
