@@ -69,11 +69,11 @@ testCheckValidAttribute(Tokens) ->
   Number=list_to_integer(lists:last(Tokens)),
   case Attribute of
     "zipCode" ->
-      lists:member(Number, lists:seq(0,99999));
+      lists:member(Number, lists:seq(10000,99999));
     "gender" ->
-      lists:member(Number, lists:seq(0,4));
+      lists:member(Number, lists:seq(0,2));
     "ageGroup" ->
-      lists:member(Number, lists:seq(0,3));
+      lists:member(Number, lists:seq(0,6));
     _ ->
       false
   end.
