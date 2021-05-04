@@ -41,7 +41,7 @@ getAttribute(Tokens) ->
     "done" ->
       Query = formatQuery(),
       resetAllQueries(),
-      outputFileProcessor:receiveDone(Query);
+      receiveDone(Query);
     "reset" -> resetAllQueries();
     _ -> setNewAttributeQuery(Tokens)
   end.
@@ -66,4 +66,35 @@ setNewAttributeQuery(Tokens) ->
 formatQuery() ->
   List = ets:tab2list(query),
   [{"ageGroup",AgeTypes},{"zipCode",ZipTypes},{"gender",GenderTypes}] = List.
+
+
+%before in outputFileProcessor
+receiveDone(Query) -> io:format("received done.~n"),
+  [{"ageGroup",AgeTypes},{"zipCode",ZipTypes},{"gender",GenderTypes}] = Query,
+  getElementsFromList(tuple_to_list(ZipTypes)).
+%io:format(Query).
+
+getElementsFromList([]) -> [];
+getElementsFromList([H]) -> H,
+  case H of
+    "zipCode" -> ignore;
+    _ -> getDataFromDb(H)
+  end,
+getElementsFromList([_| T]) ->
+  getElementsFromList(T).
+%Head = lists:nth(1, List),
+%getElementsFromList(Head),
+%List2 = lists:delete(Head, List),
+%getElementsFromList(List2).
+
+getDataFromDb(ZipCode) ->
+  Data = db_nonrelational:select(event, ZipCode),
+  countOccurrences(Data).
+
+countOccurrences(Data) ->
+  %Tokens = string:tokens(Data,","),
+  %length(Tokens).
+  TotalOccurrences = length(Data),
+  ets:insert(query, {"totalOccurrences", TotalOccurrences}).
+
 
