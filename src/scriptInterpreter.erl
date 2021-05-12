@@ -32,11 +32,15 @@ initProgram() ->
 %receiveHeader(headList) ->
 %    io:format(headList).
 
+% använda tupler istället
+
+% {attrbiute, zipCode}, matcha stärng mot atom
+
 getQueryFromUser() ->
   Input = io:get_line(io:format("Set values on attributes~n")),
   Tokens = string:tokens(Input, ";=\n."),
   case testCheckValidAttribute(Tokens) of
-   true ->
+    true ->
      io:format("valid input~n"),
      queryHandler:receiveValidCommand(Input),
      getQueryFromUser();
@@ -65,11 +69,11 @@ testCheckValidAttribute([Element]) ->
     _ -> false
   end;
 testCheckValidAttribute(Tokens) ->
-  Attribute=hd(Tokens),
+  Attribute=hd(Tokens), % definiera lista
   Number=list_to_integer(lists:last(Tokens)),
   case Attribute of
     "zipCode" ->
-      lists:member(Number, lists:seq(10000,99999));
+      lists:member(Number, lists:seq(10000,99999)); % improve
     "gender" ->
       lists:member(Number, lists:seq(0,2));
     "ageGroup" ->

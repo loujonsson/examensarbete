@@ -40,6 +40,9 @@ average([], Length, Sum) ->
 loopfunction(End, End, F,Args) -> [F(Args)];
 loopfunction(Start, End, F,Args) -> [F(Args)|loopfunction(Start+1, End, F,Args)].
 
+% lägg till 1000, 4000, 8000
+% köra flera runs
+% hur mkt av tidfen är att läsa in oh cskriva ut? beräkningstid
 bench() ->
   Start = os:timestamp(),
   io:format("avrage time for 1000 sample: ~f sek ~n",[average(loopfunction(0, 10, fun test2/1,"input1000.txt"))]),
