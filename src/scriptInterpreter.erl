@@ -10,7 +10,7 @@
 -author("ant").
 
 %% API
--export([initProgram/0,getQueryFromUser/0
+-export([initProgram/0,getQueryFromUser/0, checkValidNumber/3
 ]).
 
 -include("main.hrl").
@@ -39,11 +39,11 @@ initProgram() ->
 getQueryFromUser() ->
   Input = io:get_line(io:format("Set values on attributes~n")),
   Tokens = string:tokens(Input, ";=\n."),
-  case testCheckValidAttribute(Tokens) of
+  Command = processTokens(Tokens),
+  case testnumCheckValidAttribute(Command) of
     true ->
      io:format("valid input~n"),
-     {AttributeType, Attribute} = {nth(1, Tokens), nth(2, Tokens)},
-     queryHandler:receiveQueryAttribute({AttributeType, Attribute}),
+     queryHandler:receiveQueryAttribute(Command),
      getQueryFromUser();
     false->
       io:format("invalid command~n"),
@@ -51,16 +51,22 @@ getQueryFromUser() ->
     reset ->
       io:format("reset program ~n"),
       queryHandler:receiveValidCommand(reset);
-    off ->
+    done ->
       io:format("exit program"),
       queryHandler:receiveValidCommand(done)
+  end.
+
+processTokens(Tokens) ->
+  case Tokens of
+    [SingleCommand] -> [SingleCommand];
+    [AttributeType, Attribute] -> {AttributeType, Attribute}
   end.
 
 testCheckValidAttribute([Element]) ->
   case Element of
     "done" ->
       %queryHandler:receiveValidCommand("done"),
-      off;
+      done;
     "total" ->
       true;
     "unique" ->
@@ -69,19 +75,37 @@ testCheckValidAttribute([Element]) ->
       reset;
     _ -> false
   end;
-testCheckValidAttribute(Tokens) ->
-  Attribute=hd(Tokens), % definiera lista
-  Number=list_to_integer(lists:last(Tokens)),
-  case Attribute of
+testCheckValidAttribute({AttributeType, Attribute}) ->
+  case AttributeType of
     "zipCode" ->
-      lists:member(Number, lists:seq(10000,99999)); % improve
+      lists:member(Attribute, lists:seq(10000,99999)); % improve
     "gender" ->
-      lists:member(Number, lists:seq(0,2));
+      lists:member(string:to_integer(Attribute), lists:seq(0,2));
     "ageGroup" ->
-      lists:member(Number, lists:seq(0,6));
+      lists:member(string:to_integer(Attribute), lists:seq(0,6));
     _ ->
       false
   end.
+
+testnumCheckValidAttribute({AttributeType, Attribute}) ->
+  case AttributeType of
+    "zipCode" ->
+      checkValidNumber(Attribute,9999,999999);% improve
+    "gender" ->
+      checkValidNumber(Attribute,0,2);
+    "ageGroup" ->
+      checkValidNumber(Attribute,0,2);
+    _ ->
+      false
+  end.
+
+checkValidNumber(Attribute,Min,Max) ->
+  {Number, _} = string:to_integer(Attribute),
+  if
+    (Number >= Min andalso Number =< Max) -> true;
+    true -> false
+  end.
+
 
 
 %checkValidAttribute(Attribute) ->
