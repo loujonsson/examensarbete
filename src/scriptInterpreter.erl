@@ -48,10 +48,10 @@ getQueryFromUser() ->
     false->
       io:format("invalid command~n"),
       getQueryFromUser();
-    reset ->
-      io:format("reset program ~n"),
-      queryHandler:receiveValidCommand(reset);
-    off ->
+    clear ->
+      io:format("reset program~n"),
+      queryHandler:receiveValidCommand(clear);
+    done ->
       io:format("exit program"),
       queryHandler:receiveValidCommand(done)
   end.
@@ -60,13 +60,13 @@ testCheckValidAttribute([Element]) ->
   case Element of
     "done" ->
       %queryHandler:receiveValidCommand("done"),
-      off;
+      done;
     "total" ->
       true;
     "unique" ->
       true;
-    "reset" ->
-      reset;
+    "clear" ->
+      clear;
     _ -> false
   end;
 testCheckValidAttribute(Tokens) ->

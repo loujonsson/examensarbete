@@ -43,13 +43,26 @@ fetchEtsData(Name, LookupArg) ->
 showTable() -> ets:all().
 
 % remove later, onödig kod
-receiveValidCommand(Input) ->
-  Tokens = string:tokens(Input, " \n.;="),
-  getAttribute(Tokens).
+%receiveValidCommand(Input) ->
+%  Tokens = string:tokens(Input, " \n.;="),
+%  getAttribute(Tokens).
 
+receiveValidCommand(Command) ->
+  case Command of
+    done ->
+      Query = formatQuery(),
+      %resetAllQueries(),
+      receiveDone(Query),
+      outputFileProcessor:generateOutputFile();
+    clear -> clearQuery();
+    _ -> setNewAttributeQuery(Tokens)
+  end.
 
 receiveTokens(InputTokens) ->
   getAttribute(InputTokens).
+
+
+
 
 receiveQueryAttribute({AttributeType, Attribute}) ->
   case Attribute of
