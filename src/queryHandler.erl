@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([receiveValidCommand/1, queryInit/0, fetchEts/2, showTable/0, fetchEtsData/2]).
+-export([receiveValidCommand/1, receiveTokens/1, receiveQueryAttribute/1, queryInit/0, fetchEts/2, showTable/0, fetchEtsData/2]).
 
 %-record(query, {gender, ageGroup}).
 
@@ -20,13 +20,13 @@
 
 queryInit() ->
   ets:new(query, [named_table, public, set, {keypos, 1}]),
-  ets:insert(query, {"gender", {}}), %{0,1,2}
-  ets:insert(query, {"ageGroup", {}}), %{0,1,2,3,4,5,6}
-  ets:insert(query, {"zipCode", {}}),
+  ets:insert(query, {gender, {}}), %{0,1,2}
+  ets:insert(query, {ageGroup, {}}), %{0,1,2,3,4,5,6}
+  ets:insert(query, {zipCode, {}}),
 
   ets:new(attributes, [named_table, public, set, {keypos, 1}]),
-  ets:insert(attributes, {"counterType", {"0"}}),
-  ets:insert(attributes, {"counterValue", {"0"}}).
+  ets:insert(attributes, {counterType, {0}}),
+  ets:insert(attributes, {counterValue, {0}}).
 
 fetchEts(Name, LookupArg) ->
   %[{_, Data}]
@@ -42,10 +42,29 @@ fetchEtsData(Name, LookupArg) ->
 
 showTable() -> ets:all().
 
+% remove later, onödig kod
 receiveValidCommand(Input) ->
   Tokens = string:tokens(Input, " \n.;="),
   getAttribute(Tokens).
 
+
+receiveTokens(InputTokens) ->
+  getAttribute(InputTokens).
+
+receiveQueryAttribute({AttributeType, Attribute}) ->
+  case Attribute of
+    done ->
+      Query = formatQuery(),
+      receiveDone(Query),
+      outputFileProcessor:generateOutputFile();
+    clear -> 
+      clearQuery();
+    _ -> setNewAttributeQuery({AttributeType, Attribute})
+  end. 
+
+
+
+% unneccesary code delete later
 getAttribute(Tokens) ->
   Attribute = hd(Tokens),
   case Attribute of
@@ -54,12 +73,12 @@ getAttribute(Tokens) ->
       %resetAllQueries(),
       receiveDone(Query),
       outputFileProcessor:generateOutputFile();
-    "reset" -> resetAllQueries();
+    "clear" -> clearQuery();
     _ -> setNewAttributeQuery(Tokens)
   end.
 
 % hard coded reset queries
-resetAllQueries() ->
+clearQuery() ->
   io:format("shall reset all queries in output db~n"),
   ets:delete(query),
   ets:delete(attributes),
@@ -71,21 +90,24 @@ resetAllQueries() ->
 % save data in variable
 % when done command -> take all that data as input in outputDB
 % format file from output DB.
-setNewAttributeQuery(Tokens) ->
-  Attribute = hd(Tokens),
-  Elements = lists:delete(Attribute, Tokens),
-  ets:insert(query, {Attribute, list_to_tuple(Elements)}).
+setNewAttributeQuery({AttributeType, Attribute}) ->
+  ets:insert(query, {AttributeType, Attribute}).
+
+%setNewAttributeQuery({Tokens}) ->
+%  Attribute = hd(Tokens),
+%  Elements = lists:delete(Attribute, Tokens),
+%  ets:insert(query, {Attribute, list_to_tuple(Elements)}).
 
 formatQuery() ->
   %List =
-  ets:lookup(query, "zipCode"),
+  ets:lookup(query, zipCode),
     ets:tab2list(query).
   %[{"ageGroup",AgeTypes},{"zipCode",ZipTypes},{"gender",GenderTypes}] = List.
 
 
 %before in outputFileProcessor
 receiveDone(Query) -> io:format("received done.~n"),
-  [{"ageGroup",AgeTypes},{"zipCode",ZipTypes},{"gender",GenderTypes}] = Query,
+  [{ageGroup,AgeTypes},{zipCode,ZipTypes},{gender,GenderTypes}] = Query,
   getElementsFromList(tuple_to_list(ZipTypes)).
 %io:format(Query).
 

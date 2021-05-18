@@ -42,17 +42,18 @@ getQueryFromUser() ->
   case testCheckValidAttribute(Tokens) of
     true ->
      io:format("valid input~n"),
-     queryHandler:receiveValidCommand(Input),
+     {AttributeType, Attribute} = {nth(1, Tokens), nth(2, Tokens)},
+     queryHandler:receiveQueryAttribute({AttributeType, Attribute}),
      getQueryFromUser();
     false->
       io:format("invalid command~n"),
       getQueryFromUser();
     reset ->
       io:format("reset program ~n"),
-      queryHandler:receiveValidCommand("reset");
+      queryHandler:receiveValidCommand(reset);
     off ->
       io:format("exit program"),
-      queryHandler:receiveValidCommand("done")
+      queryHandler:receiveValidCommand(done)
   end.
 
 testCheckValidAttribute([Element]) ->
