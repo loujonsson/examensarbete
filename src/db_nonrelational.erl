@@ -15,6 +15,7 @@
 
 -include_lib("stdlib/include/qlc.hrl").
 
+% configuration of database
 install(Nodes) ->
   ok = mnesia:create_schema(Nodes),
   application:start(mnesia),
