@@ -10,7 +10,7 @@
 -author("ant").
 
 %% API
--export([initProgram/0,getQueryFromUser/0, checkValidNumber/3
+-export([initProgram/0,getQueryFromUser/0, checkValidNumber/3, checkValidNumber2/3
 ]).
 
 -include("main.hrl").
@@ -106,7 +106,8 @@ checkValidNumber(Attribute,Min,Max) ->
     true -> false
   end.
 
-
+checkValidNumber2(Attribute,Min,Max) ->
+lists:member(Attribute, lists:seq(Min,Max)).
 
 %checkValidAttribute(Attribute) ->
 %  checklist = string:tokens("zipCode,gender,ageGroup,done", ","),
