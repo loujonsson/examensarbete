@@ -34,6 +34,7 @@ readHeader(IoDevice) ->
 
 writeToFile(IoDevice) ->
   Data = formatData(),
+  Data,
   file:write_file("outputFileTest.txt", Data).
 
 formatData() ->
@@ -41,8 +42,9 @@ formatData() ->
   OutputRecord = #output{reportingNode = "reportingNode1",
     reportTs = "1538388005000",
     eventType = "3",
-    counterValue = queryHandler:fetchEtsData(attributes, "counterValue"),
-    counterType = queryHandler:fetchEtsData(attributes, "counterType"),
+    %counterValue = queryHandler:fetchEtsData(attributes, "counterValue"),
+    %counterValue = "123",
+    %counterType = queryHandler:fetchEtsData(attributes, "counterType"),
     periodStartTs = "",
     periodStopTs = "",
     statId = "",
@@ -54,7 +56,7 @@ formatData() ->
     hMnc = "",
     crmGender = queryHandler:fetchEtsData(query, "gender"),
     %crmAgeGroup = queryHandler:fetchEtsData(query, "ageGroup"),
-    %crmZipCode = queryHandler:fetchEtsData(query, "zipCode"),
+    crmZipCode = queryHandler:fetchEtsData(query, "zipCode"),
     maxPresenceNo = "",
     presencePointId2 = "",
     presencePointId2Type = "",
@@ -77,8 +79,8 @@ formatData() ->
   OutputFileDataList = [OutputRecord#output.reportingNode,
     OutputRecord#output.reportTs,
     OutputRecord#output.eventType,
-    OutputRecord#output.counterValue,
-    OutputRecord#output.counterType,
+    %OutputRecord#output.counterValue,
+    %OutputRecord#output.counterType,
     OutputRecord#output.periodStartTs,
     OutputRecord#output.periodStopTs,
     OutputRecord#output.statId,
@@ -89,7 +91,7 @@ formatData() ->
     OutputRecord#output.hMcc,
     OutputRecord#output.hMnc,
     OutputRecord#output.crmGender,
-    OutputRecord#output.crmAgeGroup,
+    %OutputRecord#output.crmAgeGroup,
     OutputRecord#output.crmZipCode,
     OutputRecord#output.maxPresenceNo,
     OutputRecord#output.presencePointId2,

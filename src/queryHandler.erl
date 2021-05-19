@@ -20,9 +20,9 @@
 
 queryInit() ->
   ets:new(query, [named_table, public, set, {keypos, 1}]),
-  %ets:insert(query, {gender, {}}), %{0,1,2}
-  %ets:insert(query, {ageGroup, {}}), %{0,1,2,3,4,5,6}
-  %ets:insert(query, {zipCode, {}}),
+  ets:insert(query, {gender, {}}), %{0,1,2}
+  ets:insert(query, {ageGroup, {}}), %{0,1,2,3,4,5,6}
+  ets:insert(query, {zipCode, {}}),
 
   ets:new(attributes, [named_table, public, set, {keypos, 1}]),
   ets:insert(attributes, {counterType, {0}}),
@@ -33,12 +33,18 @@ fetchEts(Name, LookupArg) ->
   ets:lookup(Name, LookupArg).
 
 fetchEtsData(Name, LookupArg) ->
-  List = ets:lookup(Name, LookupArg),
-  {_, Element} = hd(List),
-  case Element of
-    {Data} -> Data;
-    _ -> ""
+  %List = ets:lookup(Name, LookupArg),
+  [{_, Data}] = ets:lookup(Name, LookupArg),
+  %{_, Element} = hd(List),
+  %case Element of
+  %  {Data} -> Data;
+  %  _ -> ""
+  %end.
+  case Data of 
+    {} -> "";
+    Data -> Data
   end.
+  
 
 showTable() -> ets:all().
 
@@ -119,13 +125,13 @@ formatQuery() ->
 
 %before in outputFileProcessor
 receiveDone(Query) -> io:format("received done.~n"),
-  getListValue(Query).
+  getElementsFromList(Query).
   %[{ageGroup,AgeTypes},{zipCode,ZipTypes},{gender,GenderTypes}] = Query,
   %getElementsFromList(tuple_to_list(ZipTypes)).
 %io:format(Query).
 
 getElementsFromList([]) -> [];
-getElementsFromList([{AttributeType, Attribute}]) -> H,
+getElementsFromList([{AttributeType, Attribute}]) -> {AttributeType, Attribute},
   %case H of
     %"zipCode" -> ignore;
   %  _ -> getDataFromDb(Attribute)
@@ -147,7 +153,7 @@ countOccurrences(Data) ->
   %length(Tokens).
   Length = length(Data),
   TotalOccurrences = to_string(Length),
-  ets:insert(attributes, {"counterValue", {TotalOccurrences}}).
+  ets:insert(attributes, {counterValue, {TotalOccurrences}}).
 
 to_string(Number) ->
   lists:flatten(io_lib:format("~p", [Number])).

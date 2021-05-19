@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([install/1, write/1, write_testEvent/0, traverse_table_and_show/1, select/2, select_all/0, select_distinct/1]).
+-export([install/1, write/1, write_testEvent/0, traverse_table_and_show/1, select/3, select_all/0, select_distinct/1]).
 -include("main.hrl").
 
 -include_lib("stdlib/include/qlc.hrl").
@@ -62,38 +62,65 @@ write(Event) ->
   mnesia:dirty_write(Event).
 
 select(Table_name, AttributeType, Attribute) ->
-  MatchHead = #event{reportingNode = '$1',
-                  %reportTs = '$2',
-                  %eventTs = '$3',
-                  %eventType = '$4',
-                  %hMcc = '$5',
-                  %hMnc = '$6',
-                  hashedImsi = '$6',
-                  %vMcc = '$7',
-                  %vMnc = '$8',
-                  %rat = '$9',
-                  %cellName = '$10',
-                  %gsmLac = '$11',
-                  %gsmCid = '$12',
-                  %umtsLac = '$12',
-                  %umtsSac = '$13',
-                  %umtsRncId = '$14',
-                  %umtsCi = '$15',
-                  %lteEnodeBId = '$16',
-                  %lteCi = '$17',
-                  %cellPortionId = '$18',
-                  %locationEstimateShape = '$19',
-                  %locationEstimateLat = '$20',
-                  %locationEstimateLon = '$21',
-                  %locationEstimateRadius = '$22',
-                  crmGender = '$23',
-                  crmAgeGroup = '$24',
-                  crmZipCode = Attribute,
-                  %presencePointId = '$25',
-                  %groupPresencePointId = '$26'
-                  _ = '_'
-                },
+  MatchHead = case AttributeType of
+    zipCode -> select_zipCode(Attribute);
+    gender -> select_gender(Attribute);
+    ageGroup -> select_ageGroup(Attribute)
+  end,
   mnesia:dirty_select(Table_name, [{MatchHead, [], ['$1']}]).
+
+select_zipCode(ZipCode) ->
+  #event{reportingNode = '$1',
+          %reportTs = '$2',
+          %eventTs = '$3',
+          %eventType = '$4',
+          %hMcc = '$5',
+          %hMnc = '$6',
+          hashedImsi = '$6',
+          %vMcc = '$7',
+          %vMnc = '$8',
+          %rat = '$9',
+          %cellName = '$10',
+          %gsmLac = '$11',
+          %gsmCid = '$12',
+          %umtsLac = '$12',
+          %umtsSac = '$13',
+          %umtsRncId = '$14',
+          %umtsCi = '$15',
+          %lteEnodeBId = '$16',
+          %lteCi = '$17',
+          %cellPortionId = '$18',
+          %locationEstimateShape = '$19',
+          %locationEstimateLat = '$20',
+          %locationEstimateLon = '$21',
+          %locationEstimateRadius = '$22',
+          crmGender = '$23',
+          crmAgeGroup = '$24',
+          crmZipCode = ZipCode,
+          _ = '_'
+        }.
+
+select_ageGroup(AgeGroup) ->
+  #event{reportingNode = '$1',
+          reportTs = '$2',
+          hashedImsi = '$6',
+          crmGender = '$23',
+          crmAgeGroup = AgeGroup,
+          crmZipCode = '$25',
+          _ = '_'
+        }.
+
+select_gender(Gender) ->
+  #event{reportingNode = '$1',
+          reportTs = '$2',
+          hashedImsi = '$6',
+          crmGender = Gender,
+          crmAgeGroup = '$24',
+          crmZipCode = '$25',
+          _ = '_'
+        }.
+
+
 
 % QLC query list comprehensions
 %select_distinct(ZipCode) ->
