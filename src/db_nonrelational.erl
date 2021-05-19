@@ -61,7 +61,7 @@ write_testEvent() ->
 write(Event) ->
   mnesia:dirty_write(Event).
 
-select(Table_name, ZipCode) ->
+select(Table_name, AttributeType, Attribute) ->
   MatchHead = #event{reportingNode = '$1',
                   %reportTs = '$2',
                   %eventTs = '$3',
@@ -69,26 +69,26 @@ select(Table_name, ZipCode) ->
                   %hMcc = '$5',
                   %hMnc = '$6',
                   hashedImsi = '$6',
-                  vMcc = '$7',
-                  vMnc = '$8',
-                  rat = '$9',
-                  cellName = '$10',
+                  %vMcc = '$7',
+                  %vMnc = '$8',
+                  %rat = '$9',
+                  %cellName = '$10',
                   %gsmLac = '$11',
                   %gsmCid = '$12',
                   %umtsLac = '$12',
                   %umtsSac = '$13',
                   %umtsRncId = '$14',
                   %umtsCi = '$15',
-                  lteEnodeBId = '$16',
-                  lteCi = '$17',
-                  cellPortionId = '$18',
+                  %lteEnodeBId = '$16',
+                  %lteCi = '$17',
+                  %cellPortionId = '$18',
                   %locationEstimateShape = '$19',
                   %locationEstimateLat = '$20',
                   %locationEstimateLon = '$21',
                   %locationEstimateRadius = '$22',
                   crmGender = '$23',
                   crmAgeGroup = '$24',
-                  crmZipCode = ZipCode,
+                  crmZipCode = Attribute,
                   %presencePointId = '$25',
                   %groupPresencePointId = '$26'
                   _ = '_'

@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([receiveValidCommand/1, receiveTokens/1, receiveQueryAttribute/1, queryInit/0, fetchEts/2, showTable/0, fetchEtsData/2]).
+-export([receiveValidCommand/1, receiveQueryAttribute/1, queryInit/0, fetchEts/2, showTable/0, fetchEtsData/2]).
 
 %-record(query, {gender, ageGroup}).
 
@@ -20,9 +20,9 @@
 
 queryInit() ->
   ets:new(query, [named_table, public, set, {keypos, 1}]),
-  ets:insert(query, {gender, {}}), %{0,1,2}
-  ets:insert(query, {ageGroup, {}}), %{0,1,2,3,4,5,6}
-  ets:insert(query, {zipCode, {}}),
+  %ets:insert(query, {gender, {}}), %{0,1,2}
+  %ets:insert(query, {ageGroup, {}}), %{0,1,2,3,4,5,6}
+  %ets:insert(query, {zipCode, {}}),
 
   ets:new(attributes, [named_table, public, set, {keypos, 1}]),
   ets:insert(attributes, {counterType, {0}}),
@@ -54,41 +54,40 @@ receiveValidCommand(Command) ->
       %resetAllQueries(),
       receiveDone(Query),
       outputFileProcessor:generateOutputFile();
-    clear -> clearQuery();
-    _ -> setNewAttributeQuery(Tokens)
+    clear -> clearQuery()
+    %_ -> setNewAttributeQuery(Tokens)
   end.
 
-receiveTokens(InputTokens) ->
-  getAttribute(InputTokens).
-
-
+%receiveTokens(InputTokens) ->
+%  getAttribute(InputTokens).
 
 
 receiveQueryAttribute({AttributeType, Attribute}) ->
-  case Attribute of
-    done ->
-      Query = formatQuery(),
-      receiveDone(Query),
-      outputFileProcessor:generateOutputFile();
-    clear -> 
-      clearQuery();
-    _ -> setNewAttributeQuery({AttributeType, Attribute})
-  end. 
+  %case Attribute of
+    %done ->
+    %  Query = formatQuery(),
+    %  receiveDone(Query),
+    %  outputFileProcessor:generateOutputFile();
+    %clear -> 
+    %  clearQuery();
+    %_ -> 
+    setNewAttributeQuery({AttributeType, Attribute}).
+  %end. 
 
 
 
 % unneccesary code delete later
-getAttribute(Tokens) ->
-  Attribute = hd(Tokens),
-  case Attribute of
-    "done" ->
-      Query = formatQuery(),
-      %resetAllQueries(),
-      receiveDone(Query),
-      outputFileProcessor:generateOutputFile();
-    "clear" -> clearQuery();
-    _ -> setNewAttributeQuery(Tokens)
-  end.
+%getAttribute(Tokens) ->
+%  Attribute = hd(Tokens),
+%  case Attribute of
+%    "done" ->
+%      Query = formatQuery(),
+%      %resetAllQueries(),
+%      receiveDone(Query),
+%      outputFileProcessor:generateOutputFile();
+%    "clear" -> clearQuery();
+%    _ -> setNewAttributeQuery(Tokens)
+%  end.
 
 % hard coded reset queries
 clearQuery() ->
@@ -113,23 +112,25 @@ setNewAttributeQuery({AttributeType, Attribute}) ->
 
 formatQuery() ->
   %List =
-  ets:lookup(query, zipCode),
-    ets:tab2list(query).
+  %ets:lookup(query, zipCode),
+  ets:tab2list(query).
   %[{"ageGroup",AgeTypes},{"zipCode",ZipTypes},{"gender",GenderTypes}] = List.
 
 
 %before in outputFileProcessor
 receiveDone(Query) -> io:format("received done.~n"),
-  [{ageGroup,AgeTypes},{zipCode,ZipTypes},{gender,GenderTypes}] = Query,
-  getElementsFromList(tuple_to_list(ZipTypes)).
+  getListValue(Query).
+  %[{ageGroup,AgeTypes},{zipCode,ZipTypes},{gender,GenderTypes}] = Query,
+  %getElementsFromList(tuple_to_list(ZipTypes)).
 %io:format(Query).
 
 getElementsFromList([]) -> [];
-getElementsFromList([H]) -> H,
-  case H of
-    "zipCode" -> ignore;
-    _ -> getDataFromDb(H)
-  end;
+getElementsFromList([{AttributeType, Attribute}]) -> H,
+  %case H of
+    %"zipCode" -> ignore;
+  %  _ -> getDataFromDb(Attribute)
+  %end;
+  getDataFromDb(AttributeType, Attribute);
 getElementsFromList([_| T]) ->
   getElementsFromList(T).
 %Head = lists:nth(1, List),
@@ -137,8 +138,8 @@ getElementsFromList([_| T]) ->
 %List2 = lists:delete(Head, List),
 %getElementsFromList(List2).
 
-getDataFromDb(ZipCode) ->
-  Data = db_nonrelational:select(event, ZipCode),
+getDataFromDb(AttributeType, Attribute) ->
+  Data = db_nonrelational:select(event, AttributeType, Attribute),
   countOccurrences(Data).
 
 countOccurrences(Data) ->
