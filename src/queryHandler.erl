@@ -20,9 +20,9 @@
 
 queryInit() ->
   ets:new(query, [named_table, public, set, {keypos, 1}]),
-  ets:insert(query, {gender, {}}), %{0,1,2}
-  ets:insert(query, {ageGroup, {}}), %{0,1,2,3,4,5,6}
-  ets:insert(query, {zipCode, {}}),
+  ets:insert(query, {"gender", {}}), %{0,1,2}
+  ets:insert(query, {"ageGroup", {}}), %{0,1,2,3,4,5,6}
+  ets:insert(query, {"zipCode", {}}),
 
   ets:new(attributes, [named_table, public, set, {keypos, 1}]),
   ets:insert(attributes, {counterType, {0}}),
