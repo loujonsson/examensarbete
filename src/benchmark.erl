@@ -10,7 +10,7 @@
 -author("ant").
 
 %% API
--export([testfile/1,benchmarkInput/0,benchmark/0,stdv/1,mean/1, sumPowerByTwo/2]).
+-export([testfile/1,benchmarkInput/0,benchmark/0,stdv/1,mean/1, sumPowerByTwo/2,test/0,benchmarkCustomeInput/1]).
 %test1-3 are different tests of counting time
 %not working - no list
 testfile(Filename) ->
@@ -18,6 +18,8 @@ testfile(Filename) ->
   main:run(Filename),
   Time=timer:now_diff(os:timestamp(), Start) / 100000,
   Time.
+testfilecustome(String) ->
+  fileProcessor:parse(String).
 
 
 testCheckValidNumber(Attribute) ->
@@ -39,7 +41,9 @@ average([], Length, Sum) ->
   Sum / Length.
 
 loopfunction(End, End, F,Args) -> [F(Args)];
-loopfunction(Start, End, F,Args) -> [F(Args)|loopfunction(Start+1, End, F,Args)].
+loopfunction(Start, End, F,Args) -> [F(Args)|loopfunction(Start, End, F,Args)].
+
+
 
 
 
@@ -64,37 +68,48 @@ stdv(NumberList) ->
 % lägg till 1000, 4000, 8000
 % köra flera runs
 % hur mkt av tidfen är att läsa in oh cskriva ut? beräkningstid
-loopclass(Function,Parameter,NumberOfLoops) ->
+loopclass(Function,Parameter,NumberOfLoops,Num) ->
   ListOfValues=loopfunction(0, NumberOfLoops, Function,Parameter),
-  [mean(ListOfValues),stdv(ListOfValues)].
+  [average(ListOfValues),stdv(ListOfValues),Num/average(ListOfValues)].
+
+
+
+
+
+loopclasscustom(NumberRows) ->
+  ListOfValues=loopfunction(0, NumberRows,fun loopclasscustom2/1,NumberRows),
+  [average(ListOfValues),stdv(ListOfValues),NumberRows/average(ListOfValues)].
+
+loopclasscustom2(NumberRows) ->
+  Start = os:timestamp(),
+  loopfunction(0, NumberRows, fun testfilecustome/1,"reportingnode1,1538388005000,1538388000000,1,240,10,10000000000000000000000000000000000000000000000000000000,240,10,3,12,12,12,10102,30211,102,30211,12,12,12,1,59.31683,18.0569,175,1,2,11010,12,CRLF"),
+  Time=timer:now_diff(os:timestamp(), Start) / 100000,
+  Time.
+
+
 benchmarkInput() ->
   io:format("start benchamrk input ~n"),
   Start = os:timestamp(),
-  % io:format("avrage time for 1000 sample: ~f sek ~n",[average(loopfunction(0, 10, fun testfile/1,"input1000.txt"))]),
-  % io:format("avrage time for 2000 sample: ~f sek ~n",[average(loopfunction(0, 10, fun testfile/1,"input2000.txt"))]),
-  % io:format("avrage time for 3000 sample: ~f sek ~n",[average(loopfunction(0, 10, fun testfile/1,"input3000.txt"))]),
-  % io:format("avrage time for 4000 sample: ~f sek ~n",[average(loopfunction(0, 10, fun testfile/1,"input4000.txt"))]),
-  % io:format("avrage time for 5000 sample: ~f sek ~n",[average(loopfunction(0, 10, fun testfile/1,"input5000.txt"))]),
-  % io:format("avrage time for 6000 sample: ~f sek ~n",[average(loopfunction(0, 10, fun testfile/1,"input6000.txt"))]),
-  % io:format("avrage time for 7000 sample: ~f sek ~n",[average(loopfunction(0, 10, fun testfile/1,"input7000.txt"))]),
-  % io:format("avrage time for 8000 sample: ~f sek ~n",[average(loopfunction(0, 10, fun testfile/1,"input8000.txt"))]),
-  % io:format("avrage time for 9000 sample: ~f sek ~n",[average(loopfunction(0, 10, fun testfile/1,"input9000.txt"))]),
-  % io:format("avrage time for 10000 sample: ~f sek~n",[average(loopfunction(0, 10, fun testfile/1,"input10000.txt"))]),
-  % io:format("avrage time for 100000 sample: ~f sek~n",[average(loopfunction(0, 10, fun testfile/1,"input100000.txt"))]),
-
-  io:format("1000: ~f writes per sek ~n",[1000/average(loopfunction(0, 100, fun testfile/1,"input1000.txt"))]),
-  io:format("2000: ~f writes per sek ~n",[2000/average(loopfunction(0, 100, fun testfile/1,"input2000.txt"))]),
-  io:format("3000: ~f writes per sek ~n",[3000/average(loopfunction(0, 100, fun testfile/1,"input3000.txt"))]),
-  io:format("4000: ~f writes per sek ~n",[4000/average(loopfunction(0, 100, fun testfile/1,"input4000.txt"))]),
-  io:format("5000: ~f writes per sek ~n",[5000/average(loopfunction(0, 100, fun testfile/1,"input5000.txt"))]),
-  io:format("6000: ~f writes per sek ~n",[6000/average(loopfunction(0, 100, fun testfile/1,"input6000.txt"))]),
-  io:format("7000: ~f writes per sek ~n",[7000/average(loopfunction(0, 100, fun testfile/1,"input7000.txt"))]),
-  io:format("8000: ~f writes per sek ~n",[8000/average(loopfunction(0, 100, fun testfile/1,"input8000.txt"))]),
-  io:format("9000: ~f writes per sek ~n",[9000/average(loopfunction(0, 100, fun testfile/1,"input9000.txt"))]),
-  io:format("10000: ~f writes per sek ~n",[10000/average(loopfunction(0, 100, fun testfile/1,"input10000.txt"))]),
-  io:format("100000: ~f writes per sek ~n",[100000/average(loopfunction(0, 100, fun testfile/1,"input100000.txt"))]),
+  io:format("1000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopclass(fun testfile/1,"input1000.txt",100,1000)),
+  io:format("2000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input2000.txt",100,2000)),
+  io:format("3000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input3000.txt",100,3000)),
+  io:format("4000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input4000.txt",100,4000)),
+  io:format("5000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input5000.txt",100,5000)),
+  io:format("6000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input6000.txt",100,6000)),
+  io:format("7000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input7000.txt",100,7000)),
+  io:format("8000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input8000.txt",100,8000)),
+  io:format("9000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input9000.txt",100,9000)),
+  io:format("10000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input10000.txt",100,10000)),
+  io:format("100000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input100000.txt",100,100000)),
   io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
   io:format("done with benchmark~n").
+
+
+benchmarkCustomeInput(Numberofinputs) ->
+
+  io:format("avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopclasscustom(Numberofinputs)).
+
+
 
 benchmark() ->
   test().
@@ -120,6 +135,6 @@ benchmarkNumberValidator2() ->
   io:format("done with benchmarkNumberValidator2~n").
 
 test() ->
-  io:format("start benchmarkNumberValidator ~n"),
-  io:format("avrage time for 55252:  ~f sek ~n",[mean(loopfunction(0, 1000, fun testCheckValidNumber2/1,"55252"))]),
-  io:format("standart deviation:  ~f ~n",[stdv(loopfunction(0, 1000, fun testCheckValidNumber2/1,"55252"))]).
+  This=1000,
+  io:format("~p start benchmarkNumberValidator ~n",[This+1]).
+  %io:format("standart deviation :~f and avrage time ~f sek ~n",loopclass(fun testCheckValidNumber2/1,"55252",100,100)).
