@@ -6,16 +6,18 @@
 %%% @end
 %%% Created : 08. Apr 2021 17:02
 %%%-------------------------------------------------------------------
--module(fileProcessor).
+-module(fileProcessor_nonrelational).
 -author("lou").
 
 %% API
 -export([receiveFile/1]).
 -include("main.hrl").
 
+% receives file from main module
 receiveFile(File) ->
   openFile(File).
 
+% opens file
 openFile(File) ->
   Io = case file:open(File, read) of
          {ok, IoDevice} -> IoDevice;
@@ -23,6 +25,7 @@ openFile(File) ->
        end,
   readLine(Io).
 
+% read line of file until end of character is found.
 readLine(Io) ->
   case file:read_line(Io) of
     {ok, Data} -> parse(Data), readLine(Io);
@@ -31,6 +34,7 @@ readLine(Io) ->
     {error, _} -> exit(errorreadline)
   end.
 
+% parse data to tokens with "," as separator
 parse(Data) -> Tokens = string:tokens(Data, ","),
   %printTokens(Tokens),
   case hd(Tokens) of
@@ -38,9 +42,11 @@ parse(Data) -> Tokens = string:tokens(Data, ","),
     _ -> parseData(Tokens)
   end.
 
-printTokens([]) -> [];
-printTokens(Tokens) -> hd(Tokens).
+%printTokens([]) -> [];
+%printTokens(Tokens) -> hd(Tokens).
 
+
+% parses data to event record
 parseData([ReportingNode,ReportTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId] = Tokens) ->
   %io:format(Tokens),
   Event = #event{reportingNode = ReportingNode,
@@ -75,6 +81,7 @@ parseData([ReportingNode,ReportTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VM
   },
   writeToDb(Event).
 
+% writes event record to db
 writeToDb(Event) -> db_nonrelational:write(Event).
 
 % reportingNode,reportTs,eventTs,eventType,hMcc,hMnc,hashedImsi,vMcc,vMnc,rat,cellName,gsmLac,gsmCid,umtsLac,umtsSac,umtsRncId,umtsCi,lteEnodeBId,lteCi,cellPortionId,locationEstimateShape,locationEstimateLat,locationEstimateLon,locationEstimateRadius,crmGender,crmAgeGroup,crmZipCode,presencePointId,groupPresencePointId

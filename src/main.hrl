@@ -20,7 +20,8 @@
     gender,
     ageGroup,
     zipCode}).
--record(cell, {event_id,
+-record(cell, {imsi,
+    reportingTs,
     cellName,
     cellPortionId,
     locationEstimateShape,
