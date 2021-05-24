@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([receiveValidCommand/1, receiveQueryAttribute/1, queryInit/0, fetchEts/2, showTable/0, fetchEtsData/2]).
+-export([receiveValidCommand/1, receiveQueryAttribute/1, queryInit/0, attributesInit/0, fetchEts/2, showTable/0, fetchEtsData/2]).
 
 %-record(query, {gender, ageGroup}).
 
@@ -18,12 +18,15 @@
 %  #query(gender = {1,2},
 %    ageGroup = {0,1,2,3,4,5,6}).
 
+% initializes query with an ets table
 queryInit() ->
   ets:new(query, [named_table, public, set, {keypos, 1}]),
   ets:insert(query, {"gender", {}}), %{0,1,2}
   ets:insert(query, {"ageGroup", {}}), %{0,1,2,3,4,5,6}
-  ets:insert(query, {"zipCode", {}}),
+  ets:insert(query, {"zipCode", {}}).
 
+% initializes statistics attributes with an ets table
+attributesInit() ->
   ets:new(attributes, [named_table, public, set, {keypos, 1}]),
   ets:insert(attributes, {counterType, {0}}),
   ets:insert(attributes, {counterValue, {0}}).
@@ -42,6 +45,7 @@ fetchEtsData(Name, LookupArg) ->
   %end.
   case Data of 
     {} -> "";
+    [] -> "";
     Data -> Data
   end.
   
@@ -108,6 +112,9 @@ clearQuery() ->
 % save data in variable
 % when done command -> take all that data as input in outputDB
 % format file from output DB.
+
+
+% sets new query attribute in ets table
 setNewAttributeQuery({AttributeType, Attribute}) ->
   ets:insert(query, {AttributeType, Attribute}).
 

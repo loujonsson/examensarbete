@@ -28,6 +28,7 @@
 
 initProgram() ->
   queryHandler:queryInit(),
+  queryHandler:attributesInit(),
   getQueryFromUser().
 %receiveHeader(headList) ->
 %    io:format(headList).

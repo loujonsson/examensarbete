@@ -63,9 +63,9 @@ write(Event) ->
 
 select(Table_name, AttributeType, Attribute) ->
   MatchHead = case AttributeType of
-    zipCode -> select_zipCode(Attribute);
-    gender -> select_gender(Attribute);
-    ageGroup -> select_ageGroup(Attribute)
+    "zipCode" -> select_zipCode(Attribute);
+    "gender" -> select_gender(Attribute);
+    "ageGroup" -> select_ageGroup(Attribute)
   end,
   mnesia:dirty_select(Table_name, [{MatchHead, [], ['$1']}]).
 
