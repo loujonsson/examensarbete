@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([receiveFile/1,parse/1]).
+-export([receiveFile/1,parse/1,readLine/1,parseData/1]).
 -include("main.hrl").
 
 receiveFile(File) ->

@@ -10,7 +10,7 @@
 -author("ant").
 
 %% API
--export([testfile/1,benchmarkInput/0,benchmark/0,stdv/1,mean/1, sumPowerByTwo/2,test/0,benchmarkCustomeInput/1]).
+-export([testfile/1,benchmarkInput/0,benchmark/0,stdv/1,mean/1, sumPowerByTwo/2,test/0,benchmarkCustomeInput/2,testfilecustom/1,loopclasscustom2/1]).
 %test1-3 are different tests of counting time
 %not working - no list
 testfile(Filename) ->
@@ -18,9 +18,8 @@ testfile(Filename) ->
   main:run(Filename),
   Time=timer:now_diff(os:timestamp(), Start) / 100000,
   Time.
-testfilecustome(String) ->
-  fileProcessor:parse(String).
-
+testfilecustom(String) ->
+  fileProcessor:parse("reportingnode1,1538388005000,1538388000000,1,240,10,B9D2A6BD5FF6C73AFAB8064957D24F3AFB63F6181ED9A775E3786A29,240,10,3,12,12,12,10102,30211,102,30211,12,12,12,1,59.31683,18.0569,175,1,2,11010,12,CRLF2").
 
 testCheckValidNumber(Attribute) ->
   Start = os:timestamp(),
@@ -41,7 +40,7 @@ average([], Length, Sum) ->
   Sum / Length.
 
 loopfunction(End, End, F,Args) -> [F(Args)];
-loopfunction(Start, End, F,Args) -> [F(Args)|loopfunction(Start, End, F,Args)].
+loopfunction(Start, End, F,Args) -> [F(Args)|loopfunction(Start+1, End, F,Args)].
 
 
 
@@ -72,17 +71,9 @@ loopclass(Function,Parameter,NumberOfLoops,Num) ->
   ListOfValues=loopfunction(0, NumberOfLoops, Function,Parameter),
   [average(ListOfValues),stdv(ListOfValues),Num/average(ListOfValues)].
 
-
-
-
-
-loopclasscustom(NumberRows) ->
-  ListOfValues=loopfunction(0, NumberRows,fun loopclasscustom2/1,NumberRows),
-  [average(ListOfValues),stdv(ListOfValues),NumberRows/average(ListOfValues)].
-
 loopclasscustom2(NumberRows) ->
   Start = os:timestamp(),
-  loopfunction(0, NumberRows, fun testfilecustome/1,"reportingnode1,1538388005000,1538388000000,1,240,10,10000000000000000000000000000000000000000000000000000000,240,10,3,12,12,12,10102,30211,102,30211,12,12,12,1,59.31683,18.0569,175,1,2,11010,12,CRLF"),
+  loopfunction(0, NumberRows, fun testfilecustom/1,1),
   Time=timer:now_diff(os:timestamp(), Start) / 100000,
   Time.
 
@@ -90,32 +81,35 @@ loopclasscustom2(NumberRows) ->
 benchmarkInput() ->
   io:format("start benchamrk input ~n"),
   Start = os:timestamp(),
-  io:format("1000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopclass(fun testfile/1,"input1000.txt",100,1000)),
-  io:format("2000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input2000.txt",100,2000)),
-  io:format("3000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input3000.txt",100,3000)),
-  io:format("4000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input4000.txt",100,4000)),
-  io:format("5000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input5000.txt",100,5000)),
-  io:format("6000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input6000.txt",100,6000)),
-  io:format("7000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input7000.txt",100,7000)),
-  io:format("8000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input8000.txt",100,8000)),
-  io:format("9000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input9000.txt",100,9000)),
-  io:format("10000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input10000.txt",100,10000)),
-  io:format("100000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input100000.txt",100,100000)),
+  io:format("1000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopclass(fun testfile/1,"input1000.txt",10,1000)),
+  io:format("2000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input2000.txt",10,2000)),
+  io:format("3000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input3000.txt",10,3000)),
+  io:format("4000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input4000.txt",10,4000)),
+  io:format("5000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input5000.txt",10,5000)),
+  io:format("6000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input6000.txt",10,6000)),
+  io:format("7000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input7000.txt",10,7000)),
+  io:format("8000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input8000.txt",10,8000)),
+  io:format("9000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input9000.txt",10,9000)),
+  io:format("10000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input10000.txt",10,10000)),
+  io:format("100000: avrage time ~f and standart deviation and ~f sek and ~f writespeed ~n",loopclass(fun testfile/1,"input100000.txt",10,100000)),
   io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
   io:format("done with benchmark~n").
 
 
-benchmarkCustomeInput(Numberofinputs) ->
-
-  io:format("avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopclasscustom(Numberofinputs)).
+benchmarkCustomeInput(NumberOfRows,NumberOfTimes) ->
+  io:format("avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopclass(fun loopclasscustom2/1,NumberOfRows,NumberOfTimes,NumberOfRows)).
 
 
 
 benchmark() ->
-  test().
-  %benchmarkNumberValidator(),
-  %benchmarkNumberValidator2().
- % benchmarkInput(),
+  io:format("start benchamrk  ~n"),
+  Start = os:timestamp(),
+  benchmarkCustomeInput(1000,100),
+  benchmarkCustomeInput(2000,100),
+  benchmarkCustomeInput(3000,100),
+  benchmarkCustomeInput(4000,100),
+  io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
+  io:format("done with benchmark~n").
 
 benchmarkNumberValidator() ->
   io:format("start benchmarkNumberValidator ~n"),
