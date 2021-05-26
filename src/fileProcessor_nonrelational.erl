@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([receiveFile/1]).
+-export([receiveFile/1, parse/1]).
 -include("main.hrl").
 
 % receives file from main module
@@ -35,7 +35,7 @@ readLine(Io) ->
   end.
 
 % parse data to tokens with "," as separator
-parse(Data) -> Tokens = string:tokens(Data, ","),
+parse(Data) -> Tokens = string:split(Data, ",",all),
   %printTokens(Tokens),
   case hd(Tokens) of
     "reportingNode" -> header;%io:format("Found header~n");
@@ -45,12 +45,13 @@ parse(Data) -> Tokens = string:tokens(Data, ","),
 %printTokens([]) -> [];
 %printTokens(Tokens) -> hd(Tokens).
 
+hej(T) -> T.
 
 % parses data to event record
-parseData([ReportingNode,ReportTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId] = Tokens) ->
+parseData([ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId]) ->
   %io:format(Tokens),
   Event = #non_relational_event{reportingNode = ReportingNode,
-    reportTs = ReportTs,
+    reportingTs = ReportingTs,
     eventTs = EventTs,
     eventType = EventType,
     hMcc = HMcc,

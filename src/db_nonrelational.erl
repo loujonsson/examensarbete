@@ -19,13 +19,13 @@ install(Nodes) ->
   ok = mnesia:create_schema(Nodes),
   application:start(mnesia),
   mnesia:create_table(non_relational_event,
-    [{attributes, record_info(fields, event)},
-      {index, [#non_relational_event.hashedImsi, #non_relational_event.reportTs]},
+    [{attributes, record_info(fields, non_relational_event)},
+      {index, [#non_relational_event.hashedImsi, #non_relational_event.reportingTs]},
       {disc_copies, Nodes}]).
 
 write_testEvent() ->
   EventTest = #non_relational_event{reportingNode = 'reportingN1',
-    reportTs = 1538388005000,
+    reportingTs = 1538388005000,
     eventTs = 153838800000,
     eventType = 1,
     hMcc = 240,
@@ -102,7 +102,7 @@ select_zipCode(ZipCode) ->
 
 select_ageGroup(AgeGroup) ->
   #non_relational_event{reportingNode = '$1',
-          reportTs = '$2',
+          reportingTs = '$2',
           hashedImsi = '$6',
           crmGender = '$23',
           crmAgeGroup = AgeGroup,
@@ -112,7 +112,7 @@ select_ageGroup(AgeGroup) ->
 
 select_gender(Gender) ->
   #non_relational_event{reportingNode = '$1',
-          reportTs = '$2',
+          reportingTs = '$2',
           hashedImsi = '$6',
           crmGender = Gender,
           crmAgeGroup = '$24',
@@ -166,7 +166,7 @@ select_distinct(ZipCode) ->
   {atomic, Data} = mnesia:transaction(
     fun() ->
       qlc:eval(
-        qlc:q([X || X <- mnesia:select(event, {MatchHead, [Guard], [Result]})], {unique, true})
+        qlc:q([X || X <- mnesia:select(non_relational_event, {MatchHead, [Guard], [Result]})], {unique, true})
       )
     end
   ),
