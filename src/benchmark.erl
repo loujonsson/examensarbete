@@ -97,18 +97,23 @@ benchmarkInput() ->
 
 
 benchmarkCustomeInput(NumberOfRows,NumberOfTimes) ->
-  io:format("avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopclass(fun loopclasscustom2/1,NumberOfRows,NumberOfTimes,NumberOfRows)).
-
+  io:format("~p,",[NumberOfRows]),
+  io:format("~f,~f,~f ~n",loopclass(fun loopclasscustom2/1,NumberOfRows,NumberOfTimes,NumberOfRows)).
 
 benchmark() ->
   io:format("start benchamrk  ~n"),
+  io:format("average time : standart deviation : writespeed/sec~n"),
+  loop(1),
   Start = os:timestamp(),
-  benchmarkCustomeInput(1000,100),
-  benchmarkCustomeInput(2000,100),
-  benchmarkCustomeInput(3000,100),
-  benchmarkCustomeInput(4000,100),
   io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
   io:format("done with benchmark~n").
+
+
+loop(1000) ->
+  ok;
+loop(Count) ->
+  benchmarkCustomeInput(Count,100),
+  loop(Count+1).
 
 benchmarkNumberValidator() ->
   io:format("start benchmarkNumberValidator ~n"),
