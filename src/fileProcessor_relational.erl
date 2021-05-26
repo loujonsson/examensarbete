@@ -48,7 +48,7 @@ parse(Data) -> Tokens = string:split(Data, ",",all), % maybe change in the other
 
 
 % parses data to different records.
-parseData([ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId, _CLRF]) ->
+parseData([ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId]) ->
   %io:format(Tokens),
   %Event = #relational_event{hashedImsi=HashedImsi,
   %    reportingTs=ReportingTs,
@@ -88,7 +88,7 @@ parseData([ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc
   %RadioAccessType = #radio_access_type{ratType=Rat, 
   %    },
 
-  RatTypeId = db_relational:fetchRatId(),
+  RatTypeId = db_relational:fetchLastEvent(),
   db_relational:write_event(HashedImsi,ReportingTs,EventTs,EventType,CellName,ReportingNode,RatTypeId,VMcc,VMnc,GroupPresencePointId,PresencePointId),
   db_relational:write_sim_card_information(HashedImsi,CrmGender,CrmAgeGroup,CrmZipCode,HMcc,HMnc),
   db_relational:write_cell(CellName,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius),

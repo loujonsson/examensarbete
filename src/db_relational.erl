@@ -10,13 +10,16 @@
 -author("lou").
 
 %% API
--export([install/1, fetchRatId/0]).
+-export([install/1, start/2, stop/1, fetchLastEvent/0, write_event/11, write_sim_card_information/6, write_cell/6, write_radio_access_type/2, write_gsm/3, write_umts/5, write_lte/3]).
 -include("main.hrl").
 
 
 install(Nodes) ->
   ok = mnesia:create_schema(Nodes),
+  timer:sleep(1000),
   rpc:multicall(Nodes, application, start, [mnesia]),
+  %application:start(mnesia),
+
   mnesia:create_table(sim_card_information,
     [{attributes, record_info(fields, sim_card_information)},
       {index, [#sim_card_information.hashedImsi]},
@@ -26,27 +29,7 @@ install(Nodes) ->
       [{attributes, record_info(fields, cell)},
       {index, [#cell.cellName]},
       {disc_copies, Nodes}]),
-
-  %mnesia:create_table(visisted_network_info,
-  %    [{attributes, record_info(fields, visisted_network_info)},
-  %    {index, [#visisted_network_info.imsi]},
-  %    {disc_copies, Nodes}]),    
-    
-  % mnesia:create_table(home_network_info,
-  %    [{attributes, record_info(fields, home_network_info)},
-  %    {index, [#home_network_info.imsi]},
-  %    {disc_copies, Nodes}]), 
-
-  % mnesia:create_table(mobile_device,
-  %    [{attributes, record_info(fields, mobile_device)},
-  %    {index, [#mobile_device.imsi]},
-  %    {disc_copies, Nodes}]),  
-
-  % mnesia:create_table(node,
-  %    [{attributes, record_info(fields, node)},
-  %    {index, [#node.reportingNode]},
-  %    {disc_copies, Nodes}]),  
-
+  
    mnesia:create_table(relational_event,
       [{attributes, record_info(fields, relational_event)},
       {index, [#relational_event.hashedImsi, #relational_event.reportingTs]},
@@ -70,9 +53,9 @@ install(Nodes) ->
     mnesia:create_table(lte,
       [{attributes, record_info(fields, lte)},
       {index, [#lte.rat_id]},
-      {disc_copies, Nodes}]), 
+      {disc_copies, Nodes}]).
 
-    rpc:multicall(Nodes, application, stop, [mnesia]). % rpc allows mnesia action on all nodes.
+    %rpc:multicall(Nodes, application, stop, [mnesia]). % rpc allows mnesia action on all nodes.
 
 
 % wait for at most 5 seconds until tables are available.
@@ -94,7 +77,7 @@ write_event(HashedImsi, ReportingTs,EventTs, EventType, CellName, ReportingNode,
       eventType=EventType,
       cellName=CellName,
       reportingNode=ReportingNode,
-      rat=Rat,
+      ratTypeId=Rat,
       vMcc=VMcc,
       vMnc=VMnc,
       groupPresencePointId=GroupPresencePointId,
@@ -105,12 +88,12 @@ write_event(HashedImsi, ReportingTs,EventTs, EventType, CellName, ReportingNode,
 % fetch last rat id
 fetchLastEvent() -> 
   F = fun() ->
-    Event = case mnesia:last(relational_event) of
+    case mnesia:last(relational_event) of
       '$end_of_table' -> 1;
-      _ -> mnesia:last(relational_event)
+      _ -> fetchRatId(mnesia:last(relational_event))
+    end
   end,
-  mnesia:activity(transaction, F),
-  fetchRatId(Event).
+  mnesia:activity(transaction, F).
 
   fetchRatId(Event) ->
     Event#relational_event.ratTypeId+1.
@@ -243,7 +226,7 @@ write_umts(UmtsLac, UmtsSac, UmtsRncId, UmtsCi, Rat_id) ->
       true -> 
         {error, rat};
       false ->
-        mnesia:write(#gsm{umtsLac=UmtsLac,
+        mnesia:write(#umts{umtsLac=UmtsLac,
           umtsSac=UmtsSac,
           umtsRncId=UmtsRncId,
           umtsCi=UmtsCi,
@@ -259,7 +242,7 @@ write_lte(LteEnodeBId, LteCi, Rat_id) ->
       true -> 
         {error, rat};
       false ->
-        mnesia:write(#gsm{lteEnodeBId=LteEnodeBId,
+        mnesia:write(#lte{lteEnodeBId=LteEnodeBId,
           lteCi=LteCi,
           rat_id=Rat_id})
     end

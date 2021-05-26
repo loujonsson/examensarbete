@@ -22,12 +22,14 @@
     zipCode,
     hMcc,
     hMnc}).
+
 -record(cell, {cellName,
     cellPortionId,
     locationEstimateShape,
     locationEstimateLat,
     locationEstimateLon,
     locationEstimateRadius}).
+
 %-record(visited_network_info, {imsi,
 %    vMcc,
 %    vMnc}).
@@ -49,16 +51,20 @@
     vMnc,
     groupPresencePointId,
     presencePointId}). 
+
 -record(radio_access_type, {ratType,
     ratTypeId}).
+
 -record(gsm, {gsmLac,
     gsmCid,
     rat_id}).
+
 -record(umts, {umtsLac,
     umtsSac,
     umtsRncId,
     umtsCi,
     rat_id}).
+
 -record(lte, {lteEnodeBId,
     lteCi,
     rat_id}).
