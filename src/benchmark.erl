@@ -100,7 +100,6 @@ benchmarkCustomeInput(NumberOfRows,NumberOfTimes) ->
   io:format("avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopclass(fun loopclasscustom2/1,NumberOfRows,NumberOfTimes,NumberOfRows)).
 
 
-
 benchmark() ->
   io:format("start benchamrk  ~n"),
   Start = os:timestamp(),
