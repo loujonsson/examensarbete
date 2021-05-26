@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([install/1, start/2, stop/1, fetchLastEvent/0, write_event/11, write_sim_card_information/6, write_cell/6, write_radio_access_type/2, write_gsm/3, write_umts/5, write_lte/3]).
+-export([install/1, start/2, stop/1, fetchLastEvent/0, write_event/11, write_sim_card_information/6, write_cell/6, write_radio_access_type/2, write_gsm/3, write_umts/5, write_lte/3, traverse_table_and_show/1]).
 -include("main.hrl").
 
 
@@ -22,17 +22,17 @@ install(Nodes) ->
 
   mnesia:create_table(sim_card_information,
     [{attributes, record_info(fields, sim_card_information)},
-      {index, [#sim_card_information.hashedImsi]},
+      %{index, [#sim_card_information.hashedImsi]},
       {disc_copies, Nodes}]),
 
   mnesia:create_table(cell,
       [{attributes, record_info(fields, cell)},
-      {index, [#cell.cellName]},
+      %{index, [#cell.cellName]},
       {disc_copies, Nodes}]),
   
    mnesia:create_table(relational_event,
       [{attributes, record_info(fields, relational_event)},
-      {index, [#relational_event.hashedImsi, #relational_event.reportingTs]},
+      %{index, [#relational_event.hashedImsi, #relational_event.reportingTs]},
       {disc_copies, Nodes}]),  
 
     mnesia:create_table(radio_access_type,
@@ -95,7 +95,7 @@ fetchLastEvent() ->
   end,
   mnesia:activity(transaction, F).
 
-  fetchRatId(Event) ->
+  incrementRatId(Event) ->
     Event#relational_event.ratTypeId+1.
   
 
@@ -249,6 +249,20 @@ write_lte(LteEnodeBId, LteCi, Rat_id) ->
   end,
   mnesia:activity(transaction, F).
 
+
+
+
+traverse_table_and_show(Table_name)->
+  Iterator =  fun(Rec,_)->
+    io:format("~p~n",[Rec]),
+    []
+              end,
+  case mnesia:is_transaction() of
+    true -> mnesia:foldl(Iterator,[],Table_name);
+    false ->
+      Exec = fun({Fun,Tab}) -> mnesia:foldl(Fun, [],Tab) end,
+      mnesia:activity(transaction,Exec,[{Iterator,Table_name}],mnesia_frag)
+  end.
 
 
 
