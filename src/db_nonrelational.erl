@@ -18,13 +18,13 @@
 install(Nodes) ->
   ok = mnesia:create_schema(Nodes),
   application:start(mnesia),
-  mnesia:create_table(event,
+  mnesia:create_table(non_relational_event,
     [{attributes, record_info(fields, event)},
-      {index, [#event.hashedImsi, #event.reportTs]},
+      {index, [#non_relational_event.hashedImsi, #non_relational_event.reportTs]},
       {disc_copies, Nodes}]).
 
 write_testEvent() ->
-  EventTest = #event{reportingNode = 'reportingN1',
+  EventTest = #non_relational_event{reportingNode = 'reportingN1',
     reportTs = 1538388005000,
     eventTs = 153838800000,
     eventType = 1,
@@ -70,7 +70,7 @@ select(Table_name, AttributeType, Attribute) ->
   mnesia:dirty_select(Table_name, [{MatchHead, [], ['$1']}]).
 
 select_zipCode(ZipCode) ->
-  #event{reportingNode = '$1',
+  #non_relational_event{reportingNode = '$1',
           %reportTs = '$2',
           %eventTs = '$3',
           %eventType = '$4',
@@ -101,7 +101,7 @@ select_zipCode(ZipCode) ->
         }.
 
 select_ageGroup(AgeGroup) ->
-  #event{reportingNode = '$1',
+  #non_relational_event{reportingNode = '$1',
           reportTs = '$2',
           hashedImsi = '$6',
           crmGender = '$23',
@@ -111,7 +111,7 @@ select_ageGroup(AgeGroup) ->
         }.
 
 select_gender(Gender) ->
-  #event{reportingNode = '$1',
+  #non_relational_event{reportingNode = '$1',
           reportTs = '$2',
           hashedImsi = '$6',
           crmGender = Gender,
@@ -149,7 +149,7 @@ select_all() ->
   Data.
 
 select_distinct(ZipCode) ->
-  MatchHead = #event{%reportingNode = '$1',
+  MatchHead = #non_relational_event{%reportingNode = '$1',
     hashedImsi = '$6',
     vMcc = '$7',
     vMnc = '$8',

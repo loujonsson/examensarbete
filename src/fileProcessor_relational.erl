@@ -36,7 +36,7 @@ readLine(Io) ->
   end.
 
 % parse data to tokens with "," as separator
-parse(Data) -> Tokens = string:tokens(Data, ","),
+parse(Data) -> Tokens = string:split(Data, ",",all), % maybe change in the other file processor as well
   %printTokens(Tokens),
   case hd(Tokens) of
     "reportingNode" -> header;%io:format("Found header~n");
@@ -48,51 +48,64 @@ parse(Data) -> Tokens = string:tokens(Data, ","),
 
 
 % parses data to different records.
-parseData([ReportingNode,ReportTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId] = Tokens) ->
+parseData([ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId, _CLRF]) ->
   %io:format(Tokens),
-  MainEvent = #main_event{imsi=HashedImsi,
-      reportingTs = reportingTs,
-      eventType = eventType
-    },
+  %Event = #relational_event{hashedImsi=HashedImsi,
+  %    reportingTs=ReportingTs,
+  %    eventType=EventType
+  %  },
 
-  AnonymousPerson = #anonymous_person{hashedImsi=HashedImsi,
-      gender=CrmGender,
-      ageGroup=CrmAgeGroup,
-      zipCode=CrmZipCode
-    },
+  %AnonymousPerson = #anonymous_person{hashedImsi=HashedImsi,
+  %    gender=CrmGender,
+  %    ageGroup=CrmAgeGroup,
+  %    zipCode=CrmZipCode
+  %  },
 
-  Cell = #cell{imsi=HashedImsi,
-      reportingTs=ReportingTs,
-      cellName=CellName,
-      cellPortionId=CellPortionId,
-      locationEstimateShape=LocationEstimateShape,
-      locationEstimateLat=LocationEstimateLat,
-      locationEstimateLon=LocationEstimateLon,
-      locationEstimateRadius=LocationEstimateRadius
-    },
+  %Cell = #cell{imsi=HashedImsi,
+  %    reportingTs=ReportingTs,
+  %    cellName=CellName,
+  %    cellPortionId=CellPortionId,
+  %    locationEstimateShape=LocationEstimateShape,
+  %    locationEstimateLat=LocationEstimateLat,
+  %    locationEstimateLon=LocationEstimateLon,
+  %    locationEstimateRadius=LocationEstimateRadius
+  %  },
   
-  VisitedNetworkInfo = #visisted_network_info{imsi=HashedImsi,
-      vMcc=VMcc,
-      vMnc=VMnc},
+  %VisitedNetworkInfo = #visisted_network_info{imsi=HashedImsi,
+  %    vMcc=VMcc,
+  %    vMnc=VMnc},
   
-  HomeNetworkInfo = #home_network_info{imsi=HashedImsi,
-      hMcc=HMcc,
-      hMnc=HMnc},
+  %HomeNetworkInfo = #home_network_info{imsi=HashedImsi,
+  %    hMcc=HMcc,
+  %    hMnc=HMnc},
   
-  MobileDevice = #mobile_device{imsi=HashedImsi,
-      rat=Rat},
+  %MobileDevice = #mobile_device{imsi=HashedImsi,
+  %    rat=Rat},
 
-  Node = #node{reportingNode=ReportingNode,
-      imsi=HashedImsi},
+  %Node = #node{reportingNode=ReportingNode,
+  %    imsi=HashedImsi},
 
-  RadioAccessType = #radio_access_type{ratType=Rat, }
+  %RadioAccessType = #radio_access_type{ratType=Rat, 
+  %    },
+
+  RatTypeId = db_relational:fetchRatId(),
+  db_relational:write_event(HashedImsi,ReportingTs,EventTs,EventType,CellName,ReportingNode,RatTypeId,VMcc,VMnc,GroupPresencePointId,PresencePointId),
+  db_relational:write_sim_card_information(HashedImsi,CrmGender,CrmAgeGroup,CrmZipCode,HMcc,HMnc),
+  db_relational:write_cell(CellName,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius),
+  db_relational:write_radio_access_type(Rat,RatTypeId),
+  db_relational:write_gsm(GsmLac, GsmCid, RatTypeId),
+  db_relational:write_umts(UmtsLac,UmtsSac,UmtsRncId,UmtsCi,RatTypeId),
+  db_relational:write_lte(LteEnodeBId,LteCi, RatTypeId).
+  
+
+  
 
 
 
 
-  writeToDb(Event).
+  %writeToDb(Event).
 
 % writes event record to db
-writeToDb(Event) -> db_nonrelational:write(Event).
+%writeToDb(Event) -> db_relational:write(Event).
 
 % reportingNode,reportTs,eventTs,eventType,hMcc,hMnc,hashedImsi,vMcc,vMnc,rat,cellName,gsmLac,gsmCid,umtsLac,umtsSac,umtsRncId,umtsCi,lteEnodeBId,lteCi,cellPortionId,locationEstimateShape,locationEstimateLat,locationEstimateLon,locationEstimateRadius,crmGender,crmAgeGroup,crmZipCode,presencePointId,groupPresencePointId

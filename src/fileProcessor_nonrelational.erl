@@ -49,7 +49,7 @@ parse(Data) -> Tokens = string:tokens(Data, ","),
 % parses data to event record
 parseData([ReportingNode,ReportTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId] = Tokens) ->
   %io:format(Tokens),
-  Event = #event{reportingNode = ReportingNode,
+  Event = #non_relational_event{reportingNode = ReportingNode,
     reportTs = ReportTs,
     eventTs = EventTs,
     eventType = EventType,
