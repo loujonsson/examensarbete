@@ -56,19 +56,21 @@
     groupPresencePointId,
     presencePointId}). 
 
--record(radio_access_type, {ratType,
-    ratTypeId}).
+-record(radio_access_type, {ratTypeId,
+    ratType
+    }).
 
--record(gsm, {gsmLac,
-    gsmCid,
-    rat_id}).
+-record(gsm, {
+    rat_id,
+    gsmLac,
+    gsmCid}).
 
--record(umts, {umtsLac,
+-record(umts, {rat_id,
+    umtsLac,
     umtsSac,
     umtsRncId,
-    umtsCi,
-    rat_id}).
+    umtsCi}).
 
--record(lte, {lteEnodeBId,
-    lteCi,
-    rat_id}).
+-record(lte, {rat_id,
+    lteEnodeBId,
+    lteCi}).

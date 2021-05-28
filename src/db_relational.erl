@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([install/1, start/2, stop/1, fetchLastEvent/1, write_event/11, write_sim_card_information/6, write_cell/6, write_radio_access_type/2, write_gsm/3, write_umts/5, write_lte/3, traverse_table_and_show/1, read_test/1]).
+-export([install/1, start/2, stop/1, fetchLastEvent/0, write_event/11, write_sim_card_information/6, write_cell/6, write_radio_access_type/2, write_gsm/3, write_umts/5, write_lte/3, traverse_table_and_show/1, read_test/1, clearAllTables/0, select_test/1]).
 -include("main.hrl").
 
 
@@ -32,27 +32,27 @@ install(Nodes) ->
   
    mnesia:create_table(relational_event,
       [{attributes, record_info(fields, relational_event)},
-      %{index, [#relational_event.hashedImsi]},
+      {index, [#relational_event.ratTypeId]},
       {disc_copies, Nodes}]),  
 
     mnesia:create_table(radio_access_type,
       [{attributes, record_info(fields, radio_access_type)},
-      {index, [#radio_access_type.ratTypeId]},
+      %{index, [#radio_access_type.ratTypeId]},
       {disc_copies, Nodes}]), 
 
     mnesia:create_table(gsm,
       [{attributes, record_info(fields, gsm)},
-      {index, [#gsm.rat_id]},
+      %{index, [#gsm.rat_id]},
       {disc_copies, Nodes}]), 
 
     mnesia:create_table(umts,
       [{attributes, record_info(fields, umts)},
-      {index, [#umts.rat_id]},
+      %{index, [#umts.rat_id]},
       {disc_copies, Nodes}]), 
 
     mnesia:create_table(lte,
       [{attributes, record_info(fields, lte)},
-      {index, [#lte.rat_id]},
+      %{index, [#lte.rat_id]},
       {disc_copies, Nodes}]).
 
     %rpc:multicall(Nodes, application, stop, [mnesia]). % rpc allows mnesia action on all nodes.
@@ -86,18 +86,35 @@ write_event(ReportingTs, HashedImsi,EventType, EventTs, CellName, ReportingNode,
     end, 
   mnesia:activity(transaction, F). 
 
-% fetch last rat id
-fetchLastEvent(ReportingTs) -> 
+% fetch last event in relational database, in table relational_event
+fetchLastEvent() ->
   F = fun() -> 
-    case mnesia:read({relational_event, ReportingTs}) of
-      [#relational_event{ratTypeId=Id}] ->
-        Id,
+    case mnesia:last(relational_event) of
+      '$end_of_table' -> empty;
+      _ -> mnesia:last(relational_event)
+    end
+  end,
+  HashedImsi = mnesia:activity(transaction,F),
+  
+  readEventId(HashedImsi).
+
+% fetch last ratTypeId on last event
+readEventId(empty) -> 1;
+readEventId(HashedImsi) -> 
+  F = fun() -> 
+    io:format(HashedImsi),
+    case mnesia:read({relational_event, HashedImsi}) of
+      [Event] ->
+        Id = fetchEventId(Event),
         increment(Id);
       [] ->
         undefined
     end
   end,
   mnesia:activity(transaction, F).
+
+fetchEventId(Event)->
+  Event#relational_event.ratTypeId.
 
 increment(Id) -> Id+1.
 
@@ -120,7 +137,7 @@ read_test(HashedImsi) ->
   %  Event#relational_event.ratTypeId+1.
 
 % adds an anonymous person if the hashed imsi is already in the database, otherwise returns error.
-write_sim_card_information( Gender, AgeGroup, ZipCode, HashedImsi,HMcc, HMnc) ->
+write_sim_card_information(Gender, AgeGroup, ZipCode, HashedImsi,HMcc, HMnc) ->
   F = fun() ->
     case mnesia:read({relational_event, HashedImsi}) =:= [] of
       true -> 
@@ -210,64 +227,91 @@ write_cell(CellPortionId,CellName, LocationEstimateShape, LocationEstimateLat, L
   mnesia:activity(transaction, F).
 
 % add radio raccess type record to database without id, but generating id inside function scope
-write_radio_access_type(RatType,RatTypeId) ->
+write_radio_access_type(RatTypeId,RatType) ->
   F = fun() ->
-    case mnesia:read({relational_event, RatTypeId}) =:= [] of
+    MatchHead = #relational_event{ 
+          hashedImsi='$1',
+          ratTypeId=RatTypeId,
+          _ = '_'
+        },
+    case mnesia:select(relational_event, [{MatchHead, [], ['$1']}]) =:= [] of
       true -> 
         {error, rat};
       false ->
-        mnesia:write(#radio_access_type{ratType=RatType,
-          ratTypeId=RatTypeId})
+        mnesia:write(#radio_access_type{ratTypeId=RatTypeId,
+          ratType=RatType})
     end
   end,
   mnesia:activity(transaction, F).
 
 % add gsm info to database
-write_gsm(GsmLac, GsmCid, Rat_id) ->
+write_gsm(Rat_id,GsmLac, GsmCid) ->
   F = fun() ->
-    case mnesia:read({radio_access_type, Rat_id}) =:= [] of
+    MatchHead = #relational_event{ 
+          hashedImsi='$1',
+          ratTypeId=Rat_id,
+          _ = '_'
+        },
+    case mnesia:select(relational_event, [{MatchHead, [], ['$1']}]) =:= [] of
       true -> 
         {error, rat};
       false ->
-        mnesia:write(#gsm{gsmLac=GsmLac,
-          gsmCid=GsmCid,
-          rat_id=Rat_id})
+        mnesia:write(#gsm{rat_id=Rat_id,
+          gsmLac=GsmLac,
+          gsmCid=GsmCid})
     end
   end,
   mnesia:activity(transaction, F).
 
 
-write_umts(UmtsLac, UmtsSac, UmtsRncId, UmtsCi, Rat_id) ->
+write_umts(Rat_id,UmtsLac, UmtsSac, UmtsRncId, UmtsCi) ->
   F = fun() ->
-    case mnesia:read({radio_access_type, Rat_id}) =:= [] of
+    MatchHead = #relational_event{ 
+          hashedImsi='$1',
+          ratTypeId=Rat_id,
+          _ = '_'
+        },
+    case mnesia:select(relational_event, [{MatchHead, [], ['$1']}]) =:= [] of
       true -> 
         {error, rat};
       false ->
-        mnesia:write(#umts{umtsLac=UmtsLac,
+        mnesia:write(#umts{rat_id=Rat_id,
+          umtsLac=UmtsLac,
           umtsSac=UmtsSac,
           umtsRncId=UmtsRncId,
-          umtsCi=UmtsCi,
-          rat_id=Rat_id})
+          umtsCi=UmtsCi})
     end
   end,
   mnesia:activity(transaction, F).
 
 
-write_lte(LteEnodeBId, LteCi, Rat_id) ->
+write_lte(Rat_id, LteEnodeBId, LteCi) ->
   F = fun() ->
-    case mnesia:read({radio_access_type, Rat_id}) =:= [] of
+    MatchHead = #relational_event{ 
+          hashedImsi='$1',
+          ratTypeId=Rat_id,
+          _ = '_'
+        },
+    case mnesia:select(relational_event, [{MatchHead, [], ['$1']}]) =:= [] of
       true -> 
         {error, rat};
       false ->
-        mnesia:write(#lte{lteEnodeBId=LteEnodeBId,
-          lteCi=LteCi,
-          rat_id=Rat_id})
+        mnesia:write(#lte{rat_id=Rat_id,
+          lteEnodeBId=LteEnodeBId,
+          lteCi=LteCi})
     end
   end,
   mnesia:activity(transaction, F).
 
-
-
+% clears all data in all tables in the relational database.
+clearAllTables()->
+  mnesia:clear_table(relational_event),
+  mnesia:clear_table(sim_card_information),
+  mnesia:clear_table(cell),
+  mnesia:clear_table(radio_access_type),
+  mnesia:clear_table(gsm),
+  mnesia:clear_table(umts),
+  mnesia:clear_table(lte). 
 
 traverse_table_and_show(Table_name)->
   Iterator =  fun(Rec,_)->
@@ -281,10 +325,15 @@ traverse_table_and_show(Table_name)->
       mnesia:activity(transaction,Exec,[{Iterator,Table_name}],mnesia_frag)
   end.
 
-
-
-
-
-
-
+select_test(RatTypeId)->
+  F = fun() ->
+    MatchHead = #relational_event{ 
+          hashedImsi='$1',
+          ratTypeId=RatTypeId,
+          _ = '_'
+        },
+    mnesia:select(relational_event, [{MatchHead, [], ['$1']}])
+  end,
+  mnesia:activity(transaction,F).
+  
 

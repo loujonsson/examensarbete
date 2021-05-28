@@ -88,15 +88,15 @@ parseData([ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc
   %RadioAccessType = #radio_access_type{ratType=Rat, 
   %    },
   %io:format(HashedImsi),
-  RatTypeId = db_relational:fetchLastEvent(ReportingTs),
-  io:format(RatTypeId),
+  RatTypeId = db_relational:fetchLastEvent(),
+  %io:format(RatTypeId),
   db_relational:write_event(ReportingTs,HashedImsi,EventType,EventTs,CellName,ReportingNode,RatTypeId,VMcc,VMnc,GroupPresencePointId,PresencePointId),
   db_relational:write_sim_card_information(CrmGender,CrmAgeGroup,CrmZipCode,HashedImsi,HMcc,HMnc),
   db_relational:write_cell(CellPortionId,CellName,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius),
-  db_relational:write_radio_access_type(Rat,RatTypeId),
-  db_relational:write_gsm(GsmLac, GsmCid, RatTypeId),
-  db_relational:write_umts(UmtsLac,UmtsSac,UmtsRncId,UmtsCi,RatTypeId),
-  db_relational:write_lte(LteEnodeBId,LteCi, RatTypeId).
+  db_relational:write_radio_access_type(RatTypeId,Rat),
+  db_relational:write_gsm(RatTypeId,GsmLac, GsmCid),
+  db_relational:write_umts(RatTypeId,UmtsLac,UmtsSac,UmtsRncId,UmtsCi),
+  db_relational:write_lte(RatTypeId, LteEnodeBId,LteCi).
   
 
   
