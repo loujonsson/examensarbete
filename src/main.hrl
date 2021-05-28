@@ -16,14 +16,16 @@
 
 
 % for relational database.
--record(sim_card_information, {hashedImsi,
+-record(sim_card_information, {
+    hashedImsi,
     gender,
     ageGroup,
     zipCode,
     hMcc,
     hMnc}).
 
--record(cell, {cellName,
+-record(cell, {
+    cellName,
     cellPortionId,
     locationEstimateShape,
     locationEstimateLat,
@@ -40,10 +42,12 @@
 %    rat}).
 %-record(node, {reportingNode,
 %    imsi}).
--record(relational_event, {hashedImsi,
+-record(relational_event, {
+    hashedImsi,
     reportingTs,
-    eventTs,
     eventType, % = 1
+    eventTs,
+    %eventType, % = 1
     cellName,
     reportingNode,
     ratTypeId,

@@ -48,7 +48,7 @@ parse(Data) -> Tokens = string:split(Data, ",",all), % maybe change in the other
 
 
 % parses data to different records.
-parseData([ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId]) ->
+parseData([ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId]=T) ->
   %io:format(Tokens),
   %Event = #relational_event{hashedImsi=HashedImsi,
   %    reportingTs=ReportingTs,
@@ -87,11 +87,12 @@ parseData([ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc
 
   %RadioAccessType = #radio_access_type{ratType=Rat, 
   %    },
-
-  RatTypeId = db_relational:fetchLastEvent(),
-  db_relational:write_event(HashedImsi,ReportingTs,EventTs,EventType,CellName,ReportingNode,RatTypeId,VMcc,VMnc,GroupPresencePointId,PresencePointId),
-  db_relational:write_sim_card_information(HashedImsi,CrmGender,CrmAgeGroup,CrmZipCode,HMcc,HMnc),
-  db_relational:write_cell(CellName,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius),
+  %io:format(HashedImsi),
+  RatTypeId = db_relational:fetchLastEvent(ReportingTs),
+  io:format(RatTypeId),
+  db_relational:write_event(ReportingTs,HashedImsi,EventType,EventTs,CellName,ReportingNode,RatTypeId,VMcc,VMnc,GroupPresencePointId,PresencePointId),
+  db_relational:write_sim_card_information(CrmGender,CrmAgeGroup,CrmZipCode,HashedImsi,HMcc,HMnc),
+  db_relational:write_cell(CellPortionId,CellName,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius),
   db_relational:write_radio_access_type(Rat,RatTypeId),
   db_relational:write_gsm(GsmLac, GsmCid, RatTypeId),
   db_relational:write_umts(UmtsLac,UmtsSac,UmtsRncId,UmtsCi,RatTypeId),

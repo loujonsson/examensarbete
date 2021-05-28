@@ -10,15 +10,15 @@
 -author("lou").
 
 %% API
--export([install/1, start/2, stop/1, fetchLastEvent/0, write_event/11, write_sim_card_information/6, write_cell/6, write_radio_access_type/2, write_gsm/3, write_umts/5, write_lte/3, traverse_table_and_show/1]).
+-export([install/1, start/2, stop/1, fetchLastEvent/1, write_event/11, write_sim_card_information/6, write_cell/6, write_radio_access_type/2, write_gsm/3, write_umts/5, write_lte/3, traverse_table_and_show/1, read_test/1]).
 -include("main.hrl").
 
 
 install(Nodes) ->
   ok = mnesia:create_schema(Nodes),
-  timer:sleep(1000),
-  rpc:multicall(Nodes, application, start, [mnesia]),
-  %application:start(mnesia),
+  %timer:sleep(1000),
+  %rpc:multicall(Nodes, application, start, [mnesia]),
+  application:start(mnesia),
 
   mnesia:create_table(sim_card_information,
     [{attributes, record_info(fields, sim_card_information)},
@@ -32,7 +32,7 @@ install(Nodes) ->
   
    mnesia:create_table(relational_event,
       [{attributes, record_info(fields, relational_event)},
-      %{index, [#relational_event.hashedImsi, #relational_event.reportingTs]},
+      %{index, [#relational_event.hashedImsi]},
       {disc_copies, Nodes}]),  
 
     mnesia:create_table(radio_access_type,
@@ -69,12 +69,13 @@ stop(_) -> ok.
 
 % adds relational event to the database. 
 % TODO: maybe check if eventType = 1? No check yet.
-write_event(HashedImsi, ReportingTs,EventTs, EventType, CellName, ReportingNode, Rat, VMcc, VMnc,GroupPresencePointId,PresencePointId) ->
+write_event(ReportingTs, HashedImsi,EventType, EventTs, CellName, ReportingNode, Rat, VMcc, VMnc,GroupPresencePointId,PresencePointId) ->
   F = fun() ->
-    mnesia:write(#relational_event{hashedImsi=HashedImsi, 
+    mnesia:write(#relational_event{
+      hashedImsi=HashedImsi, 
       reportingTs=ReportingTs,
-      eventTs=EventTs,
       eventType=EventType,
+      eventTs=EventTs,
       cellName=CellName,
       reportingNode=ReportingNode,
       ratTypeId=Rat,
@@ -86,30 +87,50 @@ write_event(HashedImsi, ReportingTs,EventTs, EventType, CellName, ReportingNode,
   mnesia:activity(transaction, F). 
 
 % fetch last rat id
-fetchLastEvent() -> 
-  F = fun() ->
-    case mnesia:last(relational_event) of
-      '$end_of_table' -> 1;
-      _ -> fetchRatId(mnesia:last(relational_event))
+fetchLastEvent(ReportingTs) -> 
+  F = fun() -> 
+    case mnesia:read({relational_event, ReportingTs}) of
+      [#relational_event{ratTypeId=Id}] ->
+        Id,
+        increment(Id);
+      [] ->
+        undefined
     end
   end,
   mnesia:activity(transaction, F).
 
-  incrementRatId(Event) ->
-    Event#relational_event.ratTypeId+1.
+increment(Id) -> Id+1.
+
+read_test(HashedImsi) ->
+  F = fun() ->
+    mnesia:read({relational_event, HashedImsi})
+  end,
+  mnesia:activity(transaction,F).
   
 
+  %fetchLastEvent() ->
+      %case mnesia:last(relational_event) of
+  %  '$end_of_table' -> 1;
+  %  _ -> mnesia:last(relational_event)
+  %end,
+  %  Id = incrementRatId(mnesia:last(relational_event)),
+  %  Id.
+
+  %incrementRatId(Event) ->
+  %  Event#relational_event.ratTypeId+1.
+
 % adds an anonymous person if the hashed imsi is already in the database, otherwise returns error.
-write_sim_card_information(HashedImsi, Gender, AgeGroup, ZipCode, HMcc, HMnc) ->
+write_sim_card_information( Gender, AgeGroup, ZipCode, HashedImsi,HMcc, HMnc) ->
   F = fun() ->
-    case mnesia:read({relational_event, imsi}) =:= [] of
+    case mnesia:read({relational_event, HashedImsi}) =:= [] of
       true -> 
-        {error, unknown_imsi};
+        {error, unknown_event};
       false ->
-        mnesia:write(#sim_card_information{hashedImsi=HashedImsi,
+        mnesia:write(#sim_card_information{
           gender=Gender,
           ageGroup=AgeGroup,
           zipCode=ZipCode,
+          hashedImsi=HashedImsi,
           hMcc=HMcc,
           hMnc=HMnc})
     end
@@ -176,26 +197,22 @@ write_sim_card_information(HashedImsi, Gender, AgeGroup, ZipCode, HMcc, HMnc) ->
 
 % add cell to db
 % event_id should be a tuple or list or something consisting of hashed imsi and reporting ts.
-write_cell(CellName, CellPortionId, LocationEstimateShape, LocationEstimateLat, LocationEstimateLon, LocationEstimateRadius) ->
+write_cell(CellPortionId,CellName, LocationEstimateShape, LocationEstimateLat, LocationEstimateLon, LocationEstimateRadius) ->
   F = fun() ->
-    case mnesia:read({relational_event, imsi}) =:= [] of
-      true -> 
-        {error, unknown_event};
-      false ->
-        mnesia:write(#cell{cellName=CellName,
-          cellPortionId=CellPortionId,
-          locationEstimateShape=LocationEstimateShape,
-          locationEstimateLat=LocationEstimateLat,
-          locationEstimateLon=LocationEstimateLon,
-          locationEstimateRadius=LocationEstimateRadius})
-    end
+    mnesia:write(#cell{
+      cellPortionId=CellPortionId,
+      cellName=CellName,
+      locationEstimateShape=LocationEstimateShape,
+      locationEstimateLat=LocationEstimateLat,
+      locationEstimateLon=LocationEstimateLon,
+      locationEstimateRadius=LocationEstimateRadius})
   end,
   mnesia:activity(transaction, F).
 
 % add radio raccess type record to database without id, but generating id inside function scope
 write_radio_access_type(RatType,RatTypeId) ->
   F = fun() ->
-    case mnesia:read({relational_event, rat}) =:= [] of
+    case mnesia:read({relational_event, RatTypeId}) =:= [] of
       true -> 
         {error, rat};
       false ->
@@ -208,7 +225,7 @@ write_radio_access_type(RatType,RatTypeId) ->
 % add gsm info to database
 write_gsm(GsmLac, GsmCid, Rat_id) ->
   F = fun() ->
-    case mnesia:read({radio_access_type, ratTypeId}) =:= [] of
+    case mnesia:read({radio_access_type, Rat_id}) =:= [] of
       true -> 
         {error, rat};
       false ->
@@ -222,7 +239,7 @@ write_gsm(GsmLac, GsmCid, Rat_id) ->
 
 write_umts(UmtsLac, UmtsSac, UmtsRncId, UmtsCi, Rat_id) ->
   F = fun() ->
-    case mnesia:read({radio_access_type, ratTypeId}) =:= [] of
+    case mnesia:read({radio_access_type, Rat_id}) =:= [] of
       true -> 
         {error, rat};
       false ->
@@ -238,7 +255,7 @@ write_umts(UmtsLac, UmtsSac, UmtsRncId, UmtsCi, Rat_id) ->
 
 write_lte(LteEnodeBId, LteCi, Rat_id) ->
   F = fun() ->
-    case mnesia:read({radio_access_type, ratTypeId}) =:= [] of
+    case mnesia:read({radio_access_type, Rat_id}) =:= [] of
       true -> 
         {error, rat};
       false ->
