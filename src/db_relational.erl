@@ -102,7 +102,6 @@ fetchLastEvent() ->
 readEventId(empty) -> 1;
 readEventId(HashedImsi) -> 
   F = fun() -> 
-    io:format(HashedImsi),
     case mnesia:read({relational_event, HashedImsi}) of
       [Event] ->
         Id = fetchEventId(Event),
