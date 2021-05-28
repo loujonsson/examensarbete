@@ -28,6 +28,7 @@
 
 initProgram() ->
   queryHandler:queryInit(),
+  queryHandler:attributesInit(),
   getQueryFromUser().
 %receiveHeader(headList) ->
 %    io:format(headList).
@@ -87,6 +88,19 @@ testCheckValidAttribute({AttributeType, Attribute}) ->
       false
   end.
 
+testnumCheckValidAttribute([Element]) ->
+  case Element of
+    "done" ->
+      %queryHandler:receiveValidCommand("done"),
+      done;
+    "total" ->
+      true;
+    "unique" ->
+      true;
+    "clear" ->
+      clear;
+    _ -> false
+  end;
 testnumCheckValidAttribute({AttributeType, Attribute}) ->
   case AttributeType of
     "zipCode" ->

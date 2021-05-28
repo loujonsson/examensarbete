@@ -34,6 +34,7 @@ readHeader(IoDevice) ->
 
 writeToFile(IoDevice) ->
   Data = formatData(),
+  Data,
   file:write_file("outputFileTest.txt", Data).
 
 formatData() ->
@@ -41,8 +42,9 @@ formatData() ->
   OutputRecord = #output{reportingNode = "reportingNode1",
     reportTs = "1538388005000",
     eventType = "3",
-    counterValue = queryHandler:fetchEtsData(attributes, "counterValue"),
-    counterType = queryHandler:fetchEtsData(attributes, "counterType"),
+    %counterValue = queryHandler:fetchEtsData(attributes, "counterValue"),
+    %counterValue = "123",
+    %counterType = queryHandler:fetchEtsData(attributes, "counterType"),
     periodStartTs = "",
     periodStopTs = "",
     statId = "",
@@ -77,8 +79,8 @@ formatData() ->
   OutputFileDataList = [OutputRecord#output.reportingNode,
     OutputRecord#output.reportTs,
     OutputRecord#output.eventType,
-    OutputRecord#output.counterValue,
-    OutputRecord#output.counterType,
+    %OutputRecord#output.counterValue,
+    %OutputRecord#output.counterType,
     OutputRecord#output.periodStartTs,
     OutputRecord#output.periodStopTs,
     OutputRecord#output.statId,

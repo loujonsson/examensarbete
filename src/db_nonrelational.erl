@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([install/1, write/1, write_testEvent/0, traverse_table_and_show/1, select/2, select_all/0, select_distinct/1]).
+-export([install/1, write/1, write_testEvent/0, traverse_table_and_show/1, select/3, select_all/0, select_distinct/1]).
 -include("main.hrl").
 
 -include_lib("stdlib/include/qlc.hrl").
@@ -18,14 +18,14 @@
 install(Nodes) ->
   ok = mnesia:create_schema(Nodes),
   application:start(mnesia),
-  mnesia:create_table(event,
-    [{attributes, record_info(fields, event)},
-      {index, [#event.hashedImsi, #event.reportTs]},
+  mnesia:create_table(non_relational_event,
+    [{attributes, record_info(fields, non_relational_event)},
+      {index, [#non_relational_event.hashedImsi, #non_relational_event.reportingTs]},
       {disc_copies, Nodes}]).
 
 write_testEvent() ->
-  EventTest = #event{reportingNode = 'reportingN1',
-    reportTs = 1538388005000,
+  EventTest = #non_relational_event{reportingNode = 'reportingN1',
+    reportingTs = 1538388005000,
     eventTs = 153838800000,
     eventType = 1,
     hMcc = 240,
@@ -61,39 +61,66 @@ write_testEvent() ->
 write(Event) ->
   mnesia:dirty_write(Event).
 
-select(Table_name, ZipCode) ->
-  MatchHead = #event{reportingNode = '$1',
-                  %reportTs = '$2',
-                  %eventTs = '$3',
-                  %eventType = '$4',
-                  %hMcc = '$5',
-                  %hMnc = '$6',
-                  hashedImsi = '$6',
-                  vMcc = '$7',
-                  vMnc = '$8',
-                  rat = '$9',
-                  cellName = '$10',
-                  %gsmLac = '$11',
-                  %gsmCid = '$12',
-                  %umtsLac = '$12',
-                  %umtsSac = '$13',
-                  %umtsRncId = '$14',
-                  %umtsCi = '$15',
-                  lteEnodeBId = '$16',
-                  lteCi = '$17',
-                  cellPortionId = '$18',
-                  %locationEstimateShape = '$19',
-                  %locationEstimateLat = '$20',
-                  %locationEstimateLon = '$21',
-                  %locationEstimateRadius = '$22',
-                  crmGender = '$23',
-                  crmAgeGroup = '$24',
-                  crmZipCode = ZipCode,
-                  %presencePointId = '$25',
-                  %groupPresencePointId = '$26'
-                  _ = '_'
-                },
+select(Table_name, AttributeType, Attribute) ->
+  MatchHead = case AttributeType of
+    "zipCode" -> select_zipCode(Attribute);
+    "gender" -> select_gender(Attribute);
+    "ageGroup" -> select_ageGroup(Attribute)
+  end,
   mnesia:dirty_select(Table_name, [{MatchHead, [], ['$1']}]).
+
+select_zipCode(ZipCode) ->
+  #non_relational_event{reportingNode = '$1',
+          %reportTs = '$2',
+          %eventTs = '$3',
+          %eventType = '$4',
+          %hMcc = '$5',
+          %hMnc = '$6',
+          hashedImsi = '$6',
+          %vMcc = '$7',
+          %vMnc = '$8',
+          %rat = '$9',
+          %cellName = '$10',
+          %gsmLac = '$11',
+          %gsmCid = '$12',
+          %umtsLac = '$12',
+          %umtsSac = '$13',
+          %umtsRncId = '$14',
+          %umtsCi = '$15',
+          %lteEnodeBId = '$16',
+          %lteCi = '$17',
+          %cellPortionId = '$18',
+          %locationEstimateShape = '$19',
+          %locationEstimateLat = '$20',
+          %locationEstimateLon = '$21',
+          %locationEstimateRadius = '$22',
+          crmGender = '$23',
+          crmAgeGroup = '$24',
+          crmZipCode = ZipCode,
+          _ = '_'
+        }.
+
+select_ageGroup(AgeGroup) ->
+  #non_relational_event{reportingNode = '$1',
+          reportingTs = '$2',
+          hashedImsi = '$6',
+          crmGender = '$23',
+          crmAgeGroup = AgeGroup,
+          crmZipCode = '$25',
+          _ = '_'
+        }.
+
+select_gender(Gender) ->
+  #non_relational_event{reportingNode = '$1',
+          reportingTs = '$2',
+          hashedImsi = '$6',
+          crmGender = Gender,
+          crmAgeGroup = '$24',
+          crmZipCode = '$25',
+          _ = '_'
+        }.
+
+
 
 % QLC query list comprehensions
 %select_distinct(ZipCode) ->
@@ -122,7 +149,7 @@ select_all() ->
   Data.
 
 select_distinct(ZipCode) ->
-  MatchHead = #event{%reportingNode = '$1',
+  MatchHead = #non_relational_event{%reportingNode = '$1',
     hashedImsi = '$6',
     vMcc = '$7',
     vMnc = '$8',
@@ -139,7 +166,7 @@ select_distinct(ZipCode) ->
   {atomic, Data} = mnesia:transaction(
     fun() ->
       qlc:eval(
-        qlc:q([X || X <- mnesia:select(event, {MatchHead, [Guard], [Result]})], {unique, true})
+        qlc:q([X || X <- mnesia:select(non_relational_event, {MatchHead, [Guard], [Result]})], {unique, true})
       )
     end
   ),

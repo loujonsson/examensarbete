@@ -4,43 +4,18 @@
 %%% @doc
 %%%
 %%% @end
-%%% Created : 08. Apr 2021 17:02
+%%% Created : 25. May 2021 00:23
 %%%-------------------------------------------------------------------
--module(fileProcessor).
+-module(dataHandler_nonrelational).
 -author("lou").
 
 %% API
--export([receiveFile/1,parse/1,readLine/1,parseData/1]).
+-export([parseData/1]).
 -include("main.hrl").
 
-receiveFile(File) ->
-  openFile(File).
 
-openFile(File) ->
-  Io = case file:open(File, read) of
-         {ok, IoDevice} -> IoDevice;
-         {error, _} -> exit(nofile)
-       end,
-  readLine(Io).
-
-readLine(Io) ->
-  case file:read_line(Io) of
-    {ok, Data} -> parse(Data), readLine(Io);
-    eof -> eof;
-      %exit(eof);
-    {error, _} -> exit(errorreadline)
-  end.
-
-parse(Data) -> Tokens = string:tokens(Data, ","),
-  %printTokens(Tokens),
-  case hd(Tokens) of
-    "reportingNode" -> header;%io:format("Found header~n");
-    _ -> parseData(Tokens)
-  end.
-
-printTokens([]) -> [];
-printTokens(Tokens) -> hd(Tokens).
-
+% parses data to event record
+parseData(eof) -> eof;
 parseData([ReportingNode,ReportTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId] = Tokens) ->
   %io:format(Tokens),
   Event = #event{reportingNode = ReportingNode,
@@ -75,6 +50,5 @@ parseData([ReportingNode,ReportTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VM
   },
   writeToDb(Event).
 
+% writes event record to db
 writeToDb(Event) -> db_nonrelational:write(Event).
-
-% reportingNode,reportTs,eventTs,eventType,hMcc,hMnc,hashedImsi,vMcc,vMnc,rat,cellName,gsmLac,gsmCid,umtsLac,umtsSac,umtsRncId,umtsCi,lteEnodeBId,lteCi,cellPortionId,locationEstimateShape,locationEstimateLat,locationEstimateLon,locationEstimateRadius,crmGender,crmAgeGroup,crmZipCode,presencePointId,groupPresencePointId
