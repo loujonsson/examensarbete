@@ -39,7 +39,7 @@ initProgram() ->
 
 getQueryFromUser() ->
   Input = io:get_line(io:format("Set values on attributes~n")),
-  Tokens = string:tokens(Input, ";=\n."),
+  Tokens = string:tokens(Input, ";=\n.-:,"),
   Command = processTokens(Tokens),
   case testnumCheckValidAttribute(Command) of
     true ->
@@ -52,6 +52,8 @@ getQueryFromUser() ->
     clear ->
       io:format("reset program~n"),
       queryHandler:receiveValidCommand(clear);
+    period ->
+      timeConverter:timeConverter(Command);
     done ->
       io:format("exit program"),
       queryHandler:receiveValidCommand(done)
@@ -60,7 +62,8 @@ getQueryFromUser() ->
 processTokens(Tokens) ->
   case Tokens of
     [SingleCommand] -> [SingleCommand];
-    [AttributeType, Attribute] -> {AttributeType, Attribute}
+    [AttributeType, Attribute] -> {AttributeType, Attribute};
+    [AttributeType, YY, MM, DD, HH, MM, SS] -> {AttributeType, YY, MM, DD, HH, MM, SS}
   end.
 
 testCheckValidAttribute([Element]) ->
@@ -109,9 +112,28 @@ testnumCheckValidAttribute({AttributeType, Attribute}) ->
       checkValidNumber(Attribute,0,2);
     "ageGroup" ->
       checkValidNumber(Attribute,0,2);
+    "start" ->
+      timeConverter:timeInitiate(Attribute);
+    "stop" ->
+      timeConverter:timeInitiate(Attribute);
     _ ->
       false
   end.
+
+
+testnumCheckValidAttribute({AttributeType, YY, MM, DD, HH, MM, SS}) ->
+  case AttributeType of
+    "start" ->
+     period;
+    "stop" ->
+      period;
+    _ ->
+      false
+  end.
+
+
+
+
 
 checkValidNumber(Attribute,Min,Max) ->
   {Number, _} = string:to_integer(Attribute),
