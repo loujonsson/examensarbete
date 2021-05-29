@@ -41,6 +41,7 @@ average([], Length, Sum) ->
 
 loopfunction(End, End, F,Args) -> [F(Args)];
 loopfunction(Start, End, F,Args) -> [F(Args)|loopfunction(Start+1, End, F,Args)].
+
 %stdv section
 mean(NumberList) ->
   Sum = lists:foldl(fun(V, A) -> V + A end, 0, NumberList),
