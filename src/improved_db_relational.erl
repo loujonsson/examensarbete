@@ -89,33 +89,29 @@ write_event(ReportingTs, HashedImsi,EventType, EventTs, CellName, ReportingNode,
 % fetch last event in relational database, in table relational_event
 fetchLastEvent() ->
   F = fun() -> 
-    case mnesia:last(relational_event) of
-      '$end_of_table' -> empty;
-      _ -> mnesia:last(relational_event)
-    end
+    mnesia:last(relational_event)
   end,
   HashedImsi = mnesia:activity(transaction,F),
   
   readEventId(HashedImsi).
 
 % fetch last ratTypeId on last event
-readEventId(empty) -> 1;
+readEventId('$end_of_table') -> 1;
 readEventId(HashedImsi) -> 
   F = fun() -> 
     case mnesia:read({relational_event, HashedImsi}) of
       [Event] ->
-        Id = fetchEventId(Event),
-        increment(Id);
+        Event#relational_event.ratTypeId+1.
       [] ->
         undefined
     end
   end,
   mnesia:activity(transaction, F).
 
-fetchEventId(Event)->
-  Event#relational_event.ratTypeId.
+%fetchEventId(Event)->
+%  Event#relational_event.ratTypeId+
 
-increment(Id) -> Id+1.
+%increment(Id) -> Id+1.
 
 read_test(HashedImsi) ->
   F = fun() ->
