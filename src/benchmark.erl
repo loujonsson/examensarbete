@@ -10,7 +10,7 @@
 -author("ant").
 
 %% API
--export([testfileNonRelational/1,benchmarkInputNonRelational/0,benchmark/0,stdv/1,mean/1, sumPowerByTwo/2,benchmarkCustomeInput/2,bench/0,loopClassTime/1]).
+-export([testfileNonRelational/1,benchmarkInputNonRelational/0,benchmark/0,stdv/1,mean/1, sumPowerByTwo/2,benchmarkCustomeInput/2,bench/0,loopClassTime/1,benchmarkInputRelationalFakeData/0,benchmarkInputRelationalRealData/0,benchmarkInputNonRelationalFakeData/0,benchmarkInputNonRelationalRealData/0]).
 
 
 testfileNonRelational(Filename) ->
@@ -94,22 +94,33 @@ benchmarkInputNonRelational() ->
   io:format("100000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s ~n",loopClass(fun testfileNonRelational/1,"input100000.txt",10,100000)),
   io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
   io:format("done with benchmark~n").
-benchmarkInputRelational() ->
-io:format("start file benchmark relational~n"),
-Start = os:timestamp(),
-io:format("1000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopClass(fun testfileRelational/1,"input1000.txt",10,1000)),
-io:format("2000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s ~n",loopClass(fun testfileRelational/1,"input2000.txt",10,2000)),
-io:format("3000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s ~n",loopClass(fun testfileRelational/1,"input3000.txt",10,3000)),
-io:format("4000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s ~n",loopClass(fun testfileRelational/1,"input4000.txt",10,4000)),
-io:format("5000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s ~n",loopClass(fun testfileRelational/1,"input5000.txt",10,5000)),
-io:format("6000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s ~n",loopClass(fun testfileRelational/1,"input6000.txt",10,6000)),
-io:format("7000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s ~n",loopClass(fun testfileRelational/1,"input7000.txt",10,7000)),
-io:format("8000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s ~n",loopClass(fun testfileRelational/1,"input8000.txt",10,8000)),
-io:format("9000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s ~n",loopClass(fun testfileRelational/1,"input9000.txt",10,9000)),
-io:format("10000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s ~n",loopClass(fun testfileRelational/1,"input10000.txt",10,10000)),
-io:format("100000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s ~n",loopClass(fun testfileRelational/1,"input100000.txt",10,100000)),
-io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
-io:format("done with benchmark~n").
+
+benchmarkInputNonRelationalFakeData() ->
+  io:format("start file benchmark fake data non-relational~n"),
+  Start = os:timestamp(),
+  io:format("1000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopClass(fun testfileNonRelational/1,"input1000.txt",100,1000)),
+  io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
+  io:format("done with benchmark~n").
+benchmarkInputNonRelationalRealData() ->
+  io:format("start file benchmark real data non-relational~n"),
+  Start = os:timestamp(),
+  io:format("1000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopClass(fun testfileNonRelational/1,"realinput1000.txt",100,1000)),
+  io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
+  io:format("done with benchmark~n").
+
+benchmarkInputRelationalRealData() ->
+  io:format("start file benchmark real relational~n"),
+  Start = os:timestamp(),
+  io:format("1000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopClass(fun testfileRelational/1,"realinput1000.txt",100,1000)),
+  io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
+  io:format("done with benchmark~n").
+benchmarkInputRelationalFakeData() ->
+  io:format("start file benchmark fake relational~n"),
+  Start2 = os:timestamp(),
+  io:format("1000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopClass(fun testfileRelational/1,"input1000.txt",100,1000)),
+  io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start2) / 1000000]),
+  io:format("done with benchmark~n").
+
 
 benchmarkCustomeInput(NumberOfRows,NumberOfTimes) ->
   io:format("~p,",[NumberOfRows]),
@@ -140,5 +151,4 @@ io:format(": avrage time ~f and standart deviation and ~f sek and ~f writespeed/
 
 
 bench() ->
-  benchmarkInputNonRelational(),
-  benchmarkInputRelational().
+  io:format("This is a test").
