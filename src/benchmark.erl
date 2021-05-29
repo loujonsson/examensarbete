@@ -33,9 +33,8 @@ testInputRelational(String) ->
   fileProcessor_relational:parse("reportingnode1,1538388005000,1538388000000,1,240,10,B9D2A6BD5FF6C73AFAB8064957D24F3AFB63F6181ED9A775E3786A29,240,10,3,12,12,12,10102,30211,102,30211,12,12,12,1,59.31683,18.0569,175,1,2,11010,12,CRLF2").
 
 testLou() ->
-  db_relational:write_event("B9D2A6BD5FF6C73AFAB8064957D24F3A1063F6181ED9A775E3786A29","1538388005000","1","1538388005000","cell1", "reportingNode1","4", "240", "10", [], []),
-  db_relational:write_event("B9D2A6BD5FF6C73AFAB8064957D24F3A1063F6181ED9A775E3786A30","1538388005001","1","1538388005000","cell1", "reportingNode1","4", "240", "10", [], []),
-  db_relational:write_event("B9D2A6BD5FF6C73AFAB8064957D24F3A1063F6181ED9A775E3786A31","1538388005100","1","1538388005010","cell2", "reportingNode1","4", "240", "10", [], []).
+  db_relational:write_event("B9D2A6BD5FF6C73AFAB8064957D24F3A1063F6181ED9A775E3786A29","1538388005000","1","1538388005000","cell1", "reportingNode1","4", "240", "10", [], []).
+
   
 
 average(X) ->
@@ -74,7 +73,7 @@ loopClass(Function,Parameter,NumberOfLoops,Num) ->
 
 loopClassTime(NumberRows) ->
   Start = os:timestamp(),
-  loopfunction(0, NumberRows,fun testLou/1 ,1),
+  loopfunction(0, NumberRows,fun testInputRelational/1 ,1),
   Time=timer:now_diff(os:timestamp(), Start) / 100000,
   Time.
 
@@ -133,9 +132,9 @@ benchmark() ->
   io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
   io:format("done with benchmark~n").
 
-louBench(NumberofTimesRun)->
+louBench(NumberOfRows)->
 io:format("~p,",[NumberOfRows]),
-io:format(": avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopClass(fun FunctionName/1,Attribute,10,1)),
+io:format(": avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopClass(fun loopClassTime/1,NumberOfRows,10,NumberOfRows*3)).
 
 
 
