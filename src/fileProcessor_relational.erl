@@ -90,10 +90,10 @@ parseData([ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc
   %io:format(HashedImsi),
   RatTypeId = db_relational:fetchLastEvent(),
   %io:format(RatTypeId),
-  db_relational:write_event(ReportingTs,HashedImsi,EventType,EventTs,CellName,ReportingNode,RatTypeId,VMcc,VMnc,GroupPresencePointId,PresencePointId),
-  db_relational:write_sim_card_information(CrmGender,CrmAgeGroup,CrmZipCode,HashedImsi,HMcc,HMnc),
-  db_relational:write_cell(CellPortionId,CellName,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius),
-  db_relational:write_radio_access_type(RatTypeId,Rat),
+  improved_db_relational:write_event(ReportingTs,HashedImsi,EventType,EventTs,CellName,ReportingNode,RatTypeId,VMcc,VMnc,GroupPresencePointId,PresencePointId),
+  improved_db_relational:write_sim_card_information(CrmGender,CrmAgeGroup,CrmZipCode,HashedImsi,HMcc,HMnc),
+  improved_db_relational:write_cell(CellPortionId,CellName,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius),
+  improved_db_relational:write_radio_access_type(RatTypeId,Rat),
 
   case Rat of
     "2" -> 
