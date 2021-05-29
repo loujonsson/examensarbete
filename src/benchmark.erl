@@ -133,9 +133,9 @@ benchmark() ->
   io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
   io:format("done with benchmark~n").
 
-louBench(NumberofTimesRun)->
+louBench(NumberOfRows)->
 io:format("~p,",[NumberOfRows]),
-io:format(": avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopClass(fun FunctionName/1,Attribute,10,1)),
+io:format(": avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopClass(fun loopClassTime/1,NumberOfRows,10,NumberOfRows*3)).
 
 
 
