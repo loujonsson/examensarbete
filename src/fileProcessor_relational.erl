@@ -94,9 +94,20 @@ parseData([ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc
   improved_db_relational:write_sim_card_information(CrmGender,CrmAgeGroup,CrmZipCode,HashedImsi,HMcc,HMnc),
   improved_db_relational:write_cell(CellPortionId,CellName,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius),
   improved_db_relational:write_radio_access_type(RatTypeId,Rat),
-  improved_db_relational:write_gsm(RatTypeId,GsmLac, GsmCid),
-  improved_db_relational:write_umts(RatTypeId,UmtsLac,UmtsSac,UmtsRncId,UmtsCi),
-  improved_db_relational:write_lte(RatTypeId, LteEnodeBId,LteCi).
+
+  case Rat of
+    "2" -> 
+      db_relational:write_gsm(RatTypeId,GsmLac, GsmCid);
+    "3" ->
+      db_relational:write_umts(RatTypeId,UmtsLac,UmtsSac,UmtsRncId,UmtsCi);
+    "4" ->
+      db_relational:write_lte(RatTypeId, LteEnodeBId,LteCi);
+    _ ->
+      db_relational:write_gsm(RatTypeId,GsmLac, GsmCid),
+      db_relational:write_umts(RatTypeId,UmtsLac,UmtsSac,UmtsRncId,UmtsCi),
+      db_relational:write_lte(RatTypeId, LteEnodeBId,LteCi)
+  end.
+
   
 
   

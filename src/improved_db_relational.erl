@@ -197,6 +197,7 @@ clearAllTables()->
   mnesia:clear_table(umts),
   mnesia:clear_table(lte). 
 
+% read through requested table, with table name as attribute
 traverse_table_and_show(Table_name)->
   Iterator =  fun(Rec,_)->
     io:format("~p~n",[Rec]),
