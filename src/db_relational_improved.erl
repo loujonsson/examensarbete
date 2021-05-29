@@ -102,7 +102,6 @@ fetchLastEvent() ->
 readEventId(empty) -> 1;
 readEventId(HashedImsi) -> 
   F = fun() -> 
-    io:format(HashedImsi),
     case mnesia:read({relational_event, HashedImsi}) of
       [Event] ->
         Id = fetchEventId(Event),
@@ -124,93 +123,18 @@ read_test(HashedImsi) ->
   end,
   mnesia:activity(transaction,F).
   
-
-  %fetchLastEvent() ->
-      %case mnesia:last(relational_event) of
-  %  '$end_of_table' -> 1;
-  %  _ -> mnesia:last(relational_event)
-  %end,
-  %  Id = incrementRatId(mnesia:last(relational_event)),
-  %  Id.
-
-  %incrementRatId(Event) ->
-  %  Event#relational_event.ratTypeId+1.
-
 % adds an anonymous person if the hashed imsi is already in the database, otherwise returns error.
 write_sim_card_information(Gender, AgeGroup, ZipCode, HashedImsi,HMcc, HMnc) ->
-  F = fun() ->
-    case mnesia:read({relational_event, HashedImsi}) =:= [] of
-      true -> 
-        {error, unknown_event};
-      false ->
-        mnesia:write(#sim_card_information{
-          gender=Gender,
-          ageGroup=AgeGroup,
-          zipCode=ZipCode,
-          hashedImsi=HashedImsi,
-          hMcc=HMcc,
-          hMnc=HMnc})
-    end
+  F = fun() ->  
+    mnesia:write(#sim_card_information{
+      gender=Gender,
+      ageGroup=AgeGroup,
+      zipCode=ZipCode,
+      hashedImsi=HashedImsi,
+      hMcc=HMcc,
+      hMnc=HMnc})
   end,
   mnesia:activity(transaction, F).
-
-
-% adds visited network info to db if imsi is valid
-%add_visited_network_info(imsi, vMcc, vMnc) ->
-%  F = fun() ->
-%    case mnesia:read({main_event, imsi}) =:= [] of
-%      true -> 
-%        {error, unknown_imsi};
-%      false ->
-%        mnesia:write(#visisted_network_info{imsi=imsi,
-%          vMcc=vMcc,
-%          vMnc=vMnc})
-%    end
-%  end,
-%  mnesia:activity(transaction, F).
-
-
-% add home network info to db
-%add_home_network_info(imsi, hMcc, hMnc) ->
-%  F = fun() ->
-%    case mnesia:read({main_event, imsi}) =:= [] of
-%      true -> 
-%        {error, unknown_imsi};
-%      false ->
-%        mnesia:write(#home_network_info{imsi=imsi,
-%          hMcc=hMcc,
-%          hMnc=hMnc})
-%    end
-%  end,
-%  mnesia:activity(transaction, F).
-
-% add node if imsi valid
-%add_node(imsi, reportingNode) ->
-%  F = fun() ->
-%    case mnesia:read({main_event, imsi}) =:= [] of
-%      true -> 
-%        {error, unknown_imsi};
-%      false ->
-%        mnesia:write(#node{imsi=imsi,
-%          reportingNode=reportingNode})
-%    end
-%  end,
-%  mnesia:activity(transaction, F).
-
-
-% adds mobile device to db if imsi is valid
-%add_mobile_device(imsi, rat) ->
-%  F = fun() ->
-%    case mnesia:read({main_event, imsi}) =:= [] of
-%      true -> 
-%        {error, unknown_imsi};
-%      false ->
-%        mnesia:write(#mobile_device{imsi=imsi,
-%          rat=rat})
-%    end
-%  end,
-%  mnesia:activity(transaction, F).
-
 
 % add cell to db
 % event_id should be a tuple or list or something consisting of hashed imsi and reporting ts.
@@ -229,77 +153,37 @@ write_cell(CellPortionId,CellName, LocationEstimateShape, LocationEstimateLat, L
 % add radio raccess type record to database without id, but generating id inside function scope
 write_radio_access_type(RatTypeId,RatType) ->
   F = fun() ->
-    MatchHead = #relational_event{ 
-          hashedImsi='$1',
-          ratTypeId=RatTypeId,
-          _ = '_'
-        },
-    case mnesia:select(relational_event, [{MatchHead, [], ['$1']}]) =:= [] of
-      true -> 
-        {error, rat};
-      false ->
-        mnesia:write(#radio_access_type{ratTypeId=RatTypeId,
-          ratType=RatType})
-    end
+    mnesia:write(#radio_access_type{ratTypeId=RatTypeId,
+      ratType=RatType})
   end,
   mnesia:activity(transaction, F).
 
 % add gsm info to database
 write_gsm(Rat_id,GsmLac, GsmCid) ->
   F = fun() ->
-    MatchHead = #relational_event{ 
-          hashedImsi='$1',
-          ratTypeId=Rat_id,
-          _ = '_'
-        },
-    case mnesia:select(relational_event, [{MatchHead, [], ['$1']}]) =:= [] of
-      true -> 
-        {error, rat};
-      false ->
-        mnesia:write(#gsm{rat_id=Rat_id,
-          gsmLac=GsmLac,
-          gsmCid=GsmCid})
-    end
+    mnesia:write(#gsm{rat_id=Rat_id,
+      gsmLac=GsmLac,
+      gsmCid=GsmCid})
   end,
   mnesia:activity(transaction, F).
 
 
 write_umts(Rat_id,UmtsLac, UmtsSac, UmtsRncId, UmtsCi) ->
   F = fun() ->
-    MatchHead = #relational_event{ 
-          hashedImsi='$1',
-          ratTypeId=Rat_id,
-          _ = '_'
-        },
-    case mnesia:select(relational_event, [{MatchHead, [], ['$1']}]) =:= [] of
-      true -> 
-        {error, rat};
-      false ->
-        mnesia:write(#umts{rat_id=Rat_id,
-          umtsLac=UmtsLac,
-          umtsSac=UmtsSac,
-          umtsRncId=UmtsRncId,
-          umtsCi=UmtsCi})
-    end
+    mnesia:write(#umts{rat_id=Rat_id,
+      umtsLac=UmtsLac,
+      umtsSac=UmtsSac,
+      umtsRncId=UmtsRncId,
+      umtsCi=UmtsCi})
   end,
   mnesia:activity(transaction, F).
 
 
 write_lte(Rat_id, LteEnodeBId, LteCi) ->
   F = fun() ->
-    MatchHead = #relational_event{ 
-          hashedImsi='$1',
-          ratTypeId=Rat_id,
-          _ = '_'
-        },
-    case mnesia:select(relational_event, [{MatchHead, [], ['$1']}]) =:= [] of
-      true -> 
-        {error, rat};
-      false ->
-        mnesia:write(#lte{rat_id=Rat_id,
-          lteEnodeBId=LteEnodeBId,
-          lteCi=LteCi})
-    end
+    mnesia:write(#lte{rat_id=Rat_id,
+      lteEnodeBId=LteEnodeBId,
+      lteCi=LteCi})
   end,
   mnesia:activity(transaction, F).
 
