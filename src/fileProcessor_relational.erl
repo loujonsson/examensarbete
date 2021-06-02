@@ -95,27 +95,41 @@ parseData([ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc
   improved_db_relational:write_cell(CellPortionId,CellName,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius),
   improved_db_relational:write_radio_access_type(RatTypeId,Rat),
 
+  %spawn(improved_db_relational, write_event, [ReportingTs,HashedImsi,EventType,EventTs,CellName,ReportingNode,RatTypeId,VMcc,VMnc,GroupPresencePointId,PresencePointId]),
+  %spawn(improved_db_relational, write_sim_card_information, [CrmGender,CrmAgeGroup,CrmZipCode,HashedImsi,HMcc,HMnc]),
+  %spawn(improved_db_relational, write_cell, [CellPortionId,CellName,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius]),
+  %spawn(improved_db_relational, write_radio_access_type ,[RatTypeId,Rat]),
+
+
+
   case Rat of
     "2" -> 
       db_relational:write_gsm(RatTypeId,GsmLac, GsmCid);
+      %spawn(db_relational,write_gsm,[RatTypeId,GsmLac, GsmCid]);
     "3" ->
       db_relational:write_umts(RatTypeId,UmtsLac,UmtsSac,UmtsRncId,UmtsCi);
+      %spawn(db_relational,write_umts,[RatTypeId,UmtsLac,UmtsSac,UmtsRncId,UmtsCi]);
     "4" ->
       db_relational:write_lte(RatTypeId, LteEnodeBId,LteCi);
+      %spawn(db_relational,write_lte,[RatTypeId, LteEnodeBId,LteCi]);
     _ ->
-      db_relational:write_gsm(RatTypeId,GsmLac, GsmCid),
-      db_relational:write_umts(RatTypeId,UmtsLac,UmtsSac,UmtsRncId,UmtsCi),
-      db_relational:write_lte(RatTypeId, LteEnodeBId,LteCi)
+      continue
   end.
 
-  
 
-  
-
+%io:format(RatTypeId),
 
 
 
-  %writeToDb(Event).
+
+
+
+
+
+
+
+
+%writeToDb(Event).
 
 % writes event record to db
 %writeToDb(Event) -> db_relational:write(Event).

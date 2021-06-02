@@ -20,7 +20,7 @@ install(Nodes) ->
   application:start(mnesia),
   mnesia:create_table(non_relational_event,
     [{attributes, record_info(fields, non_relational_event)},
-      {index, [#non_relational_event.hashedImsi, #non_relational_event.reportingTs]},
+      %{index, [#non_relational_event.hashedImsi, #non_relational_event.reportingTs]},
       {disc_copies, Nodes}]).
 
 write_testEvent() ->
@@ -59,7 +59,11 @@ write_testEvent() ->
 
 
 write(Event) ->
-  mnesia:dirty_write(Event).
+  F = fun() ->
+    mnesia:write(Event)
+      end,
+  mnesia:activity(transaction, F).
+
 
 select(Table_name, AttributeType, Attribute) ->
   MatchHead = case AttributeType of

@@ -10,15 +10,17 @@
 -author("ant").
 
 %% API
--export([testfileNonRelational/1,benchmarkInputNonRelational/0,benchmark/0,stdv/1,mean/1, sumPowerByTwo/2,benchmarkCustomeInput/2,bench/0,loopClassTime/1,benchmarkInputRelationalFakeData/0,benchmarkInputRelationalRealData/0,benchmarkInputNonRelationalFakeData/0,benchmarkInputNonRelationalRealData/0]).
+-export([autoloopbenchmark/0,stdv/1,mean/1, sumPowerByTwo/2,benchmarkCustomeInput/2,loopClassTime/1,autoInputNonRelational/0,autoInputRelational/0,benchmarkFileNonRelational/1]).
 
 
-testfileNonRelational(Filename) ->
+benchmarkFileNonRelational(Filename) ->
+  db_nonrelational:clearAllTables(),
   Start = os:timestamp(),
   main:run_nonrelational(Filename),
   Time=timer:now_diff(os:timestamp(), Start) / 1000000,
   Time.
-testfileRelational(Filename) ->
+benchmarkFileRelational(Filename) ->
+  improved_db_relational:clearAllTables(),
   Start = os:timestamp(),
   main:run_relational(Filename),
   Time=timer:now_diff(os:timestamp(), Start) / 1000000,
@@ -32,10 +34,6 @@ testInputNonRelational(String) ->
 testInputRelational(String) ->
   fileProcessor_relational:parse("reportingnode1,1538388005000,1538388000000,1,240,10,B9D2A6BD5FF6C73AFAB8064957D24F3AFB63F6181ED9A775E3786A29,240,10,3,12,12,12,10102,30211,102,30211,12,12,12,1,59.31683,18.0569,175,1,2,11010,12,CRLF2").
 
-testLou() ->
-  db_relational:write_event("B9D2A6BD5FF6C73AFAB8064957D24F3A1063F6181ED9A775E3786A29","1538388005000","1","1538388005000","cell1", "reportingNode1","4", "240", "10", [], []).
-
-  
 
 average(X) ->
   average(X, 0, 0).
@@ -61,97 +59,51 @@ stdv(NumberList) ->
   Mean = mean(NumberList),
   SumSquares=sumPowerByTwo(NumberList, Mean),
   math:sqrt((SumSquares)/(N)).
-
-
-
 % lägg till 1000, 4000, 8000
 % köra flera runs
 % hur mkt av tidfen är att läsa in oh cskriva ut? beräkningstid
 loopClass(Function,Parameter,NumberOfLoops,Num) ->
   ListOfValues=loopfunction(0, NumberOfLoops, Function,Parameter),
   [mean(ListOfValues),stdv(ListOfValues),Num/mean(ListOfValues)].
-
 loopClassTime(NumberRows) ->
   Start = os:timestamp(),
   loopfunction(0, NumberRows,fun testInputRelational/1 ,1),
   Time=timer:now_diff(os:timestamp(), Start) / 1000,
   Time.
 
-
-benchmarkInputNonRelational() ->
+autoInputNonRelational() ->
   io:format("start file benchmark non-relational~n"),
-  io:format("average time : standart deviation : Lines per sec ~n"),
-  db_nonrelational:clearAllTables(),
+  io:format("average time : standart deviation : rows per sec ~n"),
   Start = os:timestamp(),
-  io:format("1000,~f,~f,~f~n",loopClass(fun testfileNonRelational/1,"realinput1000.txt",100,1000)),
-  db_nonrelational:clearAllTables(),
-  io:format("2000,~f,~f,~f~n",loopClass(fun testfileNonRelational/1,"realinput2000.txt",100,2000)),
-  db_nonrelational:clearAllTables(),
-  io:format("3000,~f,~f,~f ~n",loopClass(fun testfileNonRelational/1,"realinput3000.txt",100,3000)),
-  db_nonrelational:clearAllTables(),
-  io:format("4000,~f,~f,~f~n",loopClass(fun testfileNonRelational/1,"realinput4000.txt",100,4000)),
-  db_nonrelational:clearAllTables(),
-  io:format("5000,~f,~f,~f~n",loopClass(fun testfileNonRelational/1,"realinput5000.txt",100,5000)),
-  db_nonrelational:clearAllTables(),
-  io:format("6000,~f,~f,~f~n",loopClass(fun testfileNonRelational/1,"realinput6000.txt",100,6000)),
-  db_nonrelational:clearAllTables(),
-  io:format("7000,~f,~f,~f~n",loopClass(fun testfileNonRelational/1,"realinput7000.txt",100,7000)),
-  db_nonrelational:clearAllTables(),
-  io:format("8000,~f,~f,~f~n",loopClass(fun testfileNonRelational/1,"realinput8000.txt",100,8000)),
-  db_nonrelational:clearAllTables(),
-  io:format("9000,~f,~f,~f ~n",loopClass(fun testfileNonRelational/1,"realinput9000.txt",100,9000)),
-  db_nonrelational:clearAllTables(),
-  io:format("10000,~f,~f,~f~n",loopClass(fun testfileNonRelational/1,"realinput10000.txt",100,10000)),
-  db_nonrelational:clearAllTables(),
+  io:format("1000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"realinput1000.txt",50,1000)),
+  io:format("2000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"realinput2000.txt",50,2000)),
+  io:format("3000,~f,~f,~f ~n",loopClass(fun benchmarkFileNonRelational/1,"realinput3000.txt",50,3000)),
+  io:format("4000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"realinput4000.txt",50,4000)),
+  io:format("5000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"realinput5000.txt",50,5000)),
+  io:format("6000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"realinput6000.txt",50,6000)),
+  io:format("7000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"realinput7000.txt",50,7000)),
+  io:format("8000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"realinput8000.txt",50,8000)),
+  io:format("9000,~f,~f,~f ~n",loopClass(fun benchmarkFileNonRelational/1,"realinput9000.txt",50,9000)),
+  io:format("10000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"realinput10000.txt",50,10000)),
   io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
   io:format("done with benchmark~n").
+autoInputRelational() ->
+  io:format("start file benchmark relational~n"),
+  io:format("average time : standart deviation : rows per sec ~n"),
+  improved_db_relational:clearAllTables(),
+  Start = os:timestamp(),
+  io:format("1000,~f,~f,~f~n",loopClass(fun benchmarkFileRelational/1,"realinput1000.txt",50,1000)),
+  io:format("2000,~f,~f,~f~n",loopClass(fun benchmarkFileRelational/1,"realinput2000.txt",50,2000)),
+  io:format("3000,~f,~f,~f ~n",loopClass(fun benchmarkFileRelational/1,"realinput3000.txt",50,3000)),
+  io:format("4000,~f,~f,~f~n",loopClass(fun benchmarkFileRelational/1,"realinput4000.txt",50,4000)),
+  io:format("5000,~f,~f,~f~n",loopClass(fun benchmarkFileRelational/1,"realinput5000.txt",50,5000)),
+  io:format("6000,~f,~f,~f~n",loopClass(fun benchmarkFileRelational/1,"realinput6000.txt",50,6000)),
+  io:format("7000,~f,~f,~f~n",loopClass(fun benchmarkFileRelational/1,"realinput7000.txt",50,7000)),
+  io:format("8000,~f,~f,~f~n",loopClass(fun benchmarkFileRelational/1,"realinput8000.txt",50,8000)),
+  io:format("9000,~f,~f,~f ~n",loopClass(fun benchmarkFileRelational/1,"realinput9000.txt",50,9000)),
+  io:format("10000,~f,~f,~f~n",loopClass(fun benchmarkFileRelational/1,"realinput10000.txt",50,10000)),
 
-benchmarkInputNonRelationalFakeData() ->
-  io:format("start file benchmark fake data non-relational~n"),
-  Start = os:timestamp(),
-  io:format("1000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopClass(fun testfileNonRelational/1,"input1000.txt",100,1000)),
   io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
-  io:format("done with benchmark~n").
-benchmarkInputNonRelationalRealData() ->
-  io:format("start file benchmark real data non-relational~n"),
-  Start = os:timestamp(),
-  io:format("1000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopClass(fun testfileNonRelational/1,"realinput1000.txt",100,1000)),
-  io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
-  io:format("done with benchmark~n").
-
-benchmarkInputRelationalRealData() ->
-  io:format("start file benchmark non-relational~n"),
-  io:format("average time : standart deviation : average time ~n"),
-  improved_db_relational:clearAllTables(),
-  Start = os:timestamp(),
-  %io:format("1000,~f,~f,~f~n",loopClass(fun testfileRelational/1,"realinput1000.txt",3,1000)),
-  %improved_db_relational:clearAllTables(),
-  %io:format("2000,~f,~f,~f~n",loopClass(fun testfileRelational/1,"realinput2000.txt",3,2000)),
-  %improved_db_relational:clearAllTables(),
-  %io:format("3000,~f,~f,~f ~n",loopClass(fun testfileRelational/1,"realinput3000.txt",3,3000)),
-  %improved_db_relational:clearAllTables(),
-  %io:format("4000,~f,~f,~f~n",loopClass(fun testfileRelational/1,"realinput4000.txt",3,4000)),
-  %improved_db_relational:clearAllTables(),
-  %io:format("5000,~f,~f,~f~n",loopClass(fun testfileRelational/1,"realinput5000.txt",3,5000)),
-  %improved_db_relational:clearAllTables(),
-  %io:format("6000,~f,~f,~f~n",loopClass(fun testfileRelational/1,"realinput6000.txt",3,6000)),
-  %improved_db_relational:clearAllTables(),
-  %io:format("7000,~f,~f,~f~n",loopClass(fun testfileRelational/1,"realinput7000.txt",3,7000)),
-  %improved_db_relational:clearAllTables(),
- % io:format("8000,~f,~f,~f~n",loopClass(fun testfileRelational/1,"realinput8000.txt",3,8000)),
-  improved_db_relational:clearAllTables(),
-  io:format("9000,~f,~f,~f ~n",loopClass(fun testfileRelational/1,"realinput9000.txt",3,9000)),
-  improved_db_relational:clearAllTables(),
-  io:format("10000,~f,~f,~f~n",loopClass(fun testfileRelational/1,"realinput10000.txt",3,10000)),
-  improved_db_relational:clearAllTables(),
-  io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
-  io:format("done with benchmark~n").
-
-benchmarkInputRelationalFakeData() ->
-  io:format("start file benchmark fake relational~n"),
-  Start2 = os:timestamp(),
-  io:format("1000: avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopClass(fun testfileRelational/1,"input1000.txt",100,1000)),
-  io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start2) / 1000000]),
   io:format("done with benchmark~n").
 
 
@@ -168,7 +120,7 @@ loop(Count) ->
 
 
 
-benchmark() ->
+autoloopbenchmark() ->
   io:format("start benchamrk  ~n"),
   io:format("average time : standart deviation : writespeed/sec~n"),
   Start = os:timestamp(),
@@ -176,12 +128,3 @@ benchmark() ->
   io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
   io:format("done with benchmark~n").
 
-louBench(NumberOfRows)->
-io:format("~p,",[NumberOfRows]),
-io:format(": avrage time ~f and standart deviation and ~f sek and ~f writespeed/s~n",loopClass(fun loopClassTime/1,NumberOfRows,10,NumberOfRows*3)).
-
-
-
-
-bench() ->
-  io:format("This is a test").
