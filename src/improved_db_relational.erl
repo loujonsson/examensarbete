@@ -101,7 +101,7 @@ readEventId(HashedImsi) ->
   F = fun() -> 
     case mnesia:read({relational_event, HashedImsi}) of
       [Event] ->
-        Event#relational_event.ratTypeId+1.
+        Event#relational_event.ratTypeId+1;
       [] ->
         undefined
     end
@@ -191,7 +191,9 @@ clearAllTables()->
   mnesia:clear_table(radio_access_type),
   mnesia:clear_table(gsm),
   mnesia:clear_table(umts),
-  mnesia:clear_table(lte). 
+  mnesia:clear_table(lte).
+
+
 
 % read through requested table, with table name as attribute
 traverse_table_and_show(Table_name)->

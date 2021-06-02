@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([install/1, write/1, write_testEvent/0, traverse_table_and_show/1, select/3, select_all/0, select_distinct/1]).
+-export([install/1, write/1, write_testEvent/0, traverse_table_and_show/1, select/3, select_all/0, select_distinct/1,clearAllTables/0]).
 -include("main.hrl").
 
 -include_lib("stdlib/include/qlc.hrl").
@@ -185,4 +185,7 @@ traverse_table_and_show(Table_name)->
   end.
 
 
+
+clearAllTables()->
+  mnesia:clear_table(non_relational_event).
 
