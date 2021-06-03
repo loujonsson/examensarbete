@@ -50,39 +50,9 @@ hej(T) -> T.
 % parses data to event record
 parseData([ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId]) ->
   %io:format(Tokens),
-  Event = #non_relational_event{reportingNode = ReportingNode,
-    reportingTs = ReportingTs,
-    eventTs = EventTs,
-    eventType = EventType,
-    hMcc = HMcc,
-    hMnc = HMnc,
-    hashedImsi = HashedImsi,
-    vMcc = VMcc,
-    vMnc = VMnc,
-    rat = Rat,
-    cellName = CellName,
-    gsmLac = GsmLac,
-    gsmCid = GsmCid,
-    umtsLac = UmtsLac,
-    umtsSac = UmtsSac,
-    umtsRncId = UmtsRncId,
-    umtsCi = UmtsCi,
-    lteEnodeBId = LteEnodeBId,
-    lteCi = LteCi,
-    cellPortionId = CellPortionId,
-    locationEstimateShape = LocationEstimateShape,
-    locationEstimateLat = LocationEstimateLat,
-    locationEstimateLon = LocationEstimateLon,
-    locationEstimateRadius = LocationEstimateRadius,
-    crmGender = CrmGender,
-    crmAgeGroup = CrmAgeGroup,
-    crmZipCode = CrmZipCode,
-    presencePointId = PresencePointId,
-    groupPresencePointId = GroupPresencePointId
-  },
-  writeToDb(Event).
+  db_nonrelational:write(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId).
 
 % writes event record to db
-writeToDb(Event) -> db_nonrelational:write(Event).
+%writeToDb(Event) -> db_nonrelational:write(Event).
 
 % reportingNode,reportTs,eventTs,eventType,hMcc,hMnc,hashedImsi,vMcc,vMnc,rat,cellName,gsmLac,gsmCid,umtsLac,umtsSac,umtsRncId,umtsCi,lteEnodeBId,lteCi,cellPortionId,locationEstimateShape,locationEstimateLat,locationEstimateLon,locationEstimateRadius,crmGender,crmAgeGroup,crmZipCode,presencePointId,groupPresencePointId

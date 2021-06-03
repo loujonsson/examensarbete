@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([install/1, write/1, write_testEvent/0, traverse_table_and_show/1, select/3, select_all/0, select_distinct/1,clearAllTables/0]).
+-export([install/1, write/29, write_testEvent/0, traverse_table_and_show/1, select/3, select_all/0, select_distinct/1,clearAllTables/0]).
 -include("main.hrl").
 
 -include_lib("stdlib/include/qlc.hrl").
@@ -58,9 +58,38 @@ write_testEvent() ->
   mnesia:dirty_write(EventTest).
 
 
-write(Event) ->
+write(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId) ->
   F = fun() ->
-    mnesia:write(Event)
+    mnesia:write(#non_relational_event{reportingNode = ReportingNode,
+      reportingTs = ReportingTs,
+      eventTs = EventTs,
+      eventType = EventType,
+      hMcc = HMcc,
+      hMnc = HMnc,
+      hashedImsi = HashedImsi,
+      vMcc = VMcc,
+      vMnc = VMnc,
+      rat = Rat,
+      cellName = CellName,
+      gsmLac = GsmLac,
+      gsmCid = GsmCid,
+      umtsLac = UmtsLac,
+      umtsSac = UmtsSac,
+      umtsRncId = UmtsRncId,
+      umtsCi = UmtsCi,
+      lteEnodeBId = LteEnodeBId,
+      lteCi = LteCi,
+      cellPortionId = CellPortionId,
+      locationEstimateShape = LocationEstimateShape,
+      locationEstimateLat = LocationEstimateLat,
+      locationEstimateLon = LocationEstimateLon,
+      locationEstimateRadius = LocationEstimateRadius,
+      crmGender = CrmGender,
+      crmAgeGroup = CrmAgeGroup,
+      crmZipCode = CrmZipCode,
+      presencePointId = PresencePointId,
+      groupPresencePointId = GroupPresencePointId
+    })
       end,
   mnesia:activity(transaction, F).
 
