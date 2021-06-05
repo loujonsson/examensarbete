@@ -10,10 +10,10 @@
 -author("lou").
 
 %% API
--export([install/1, write/29, write_testEvent/0, traverse_table_and_show/1, select/3, select_all/0, select_distinct/1,clearAllTables/0]).
+-export([install/1, write/29, write_dirty/29, traverse_table_and_show/1, select/3, select_all/0,clearAllTables/0]).
 -include("main.hrl").
 
--include_lib("stdlib/include/qlc.hrl").
+% -include_lib("stdlib/include/qlc.hrl").
 
 install(Nodes) ->
   ok = mnesia:create_schema(Nodes),
@@ -56,6 +56,38 @@ write_testEvent() ->
   },
   %mnesia:dirty_write(Event),
   mnesia:dirty_write(EventTest).
+
+write_dirty(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId) ->
+  mnesia:dirty_write(#non_relational_event{reportingNode = ReportingNode,
+      reportingTs = ReportingTs,
+      eventTs = EventTs,
+      eventType = EventType,
+      hMcc = HMcc,
+      hMnc = HMnc,
+      hashedImsi = HashedImsi,
+      vMcc = VMcc,
+      vMnc = VMnc,
+      rat = Rat,
+      cellName = CellName,
+      gsmLac = GsmLac,
+      gsmCid = GsmCid,
+      umtsLac = UmtsLac,
+      umtsSac = UmtsSac,
+      umtsRncId = UmtsRncId,
+      umtsCi = UmtsCi,
+      lteEnodeBId = LteEnodeBId,
+      lteCi = LteCi,
+      cellPortionId = CellPortionId,
+      locationEstimateShape = LocationEstimateShape,
+      locationEstimateLat = LocationEstimateLat,
+      locationEstimateLon = LocationEstimateLon,
+      locationEstimateRadius = LocationEstimateRadius,
+      crmGender = CrmGender,
+      crmAgeGroup = CrmAgeGroup,
+      crmZipCode = CrmZipCode,
+      presencePointId = PresencePointId,
+      groupPresencePointId = GroupPresencePointId
+    }).
 
 
 write(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId) ->
@@ -181,29 +213,29 @@ select_all() ->
   ),
   Data.
 
-select_distinct(ZipCode) ->
-  MatchHead = #non_relational_event{%reportingNode = '$1',
-    hashedImsi = '$6',
-    vMcc = '$7',
-    vMnc = '$8',
-    rat = '$9',
-    cellName = '$10',
-    crmGender = '$23',
-    crmAgeGroup = '$24',
-    crmZipCode = '$25',
-    _ = '_'
-  },
+%select_distinct(ZipCode) ->
+%  MatchHead = #non_relational_event{%reportingNode = '$1',
+%    hashedImsi = '$6',
+%    vMcc = '$7',
+%    vMnc = '$8',
+%    rat = '$9',
+%    cellName = '$10',
+%    crmGender = '$23',
+%    crmAgeGroup = '$24',
+%    crmZipCode = '$25',
+%    _ = '_'
+%  },
 
-  Guard = {'=', '$25', ZipCode},
-  Result = '$6',
-  {atomic, Data} = mnesia:transaction(
-    fun() ->
-      qlc:eval(
-        qlc:q([X || X <- mnesia:select(non_relational_event, {MatchHead, [Guard], [Result]})], {unique, true})
-      )
-    end
-  ),
-  Data.
+  %Guard = {'=', '$25', ZipCode},
+  %Result = '$6',
+  %{atomic, Data} = mnesia:transaction(
+  %  fun() ->
+  %    qlc:eval(
+  %      qlc:q([X || X <- mnesia:select(non_relational_event, {MatchHead, [Guard], [Result]})], {unique, true})
+  %    )
+  %  end
+  %),
+  %Data.
 
 traverse_table_and_show(Table_name)->
   Iterator =  fun(Rec,_)->
