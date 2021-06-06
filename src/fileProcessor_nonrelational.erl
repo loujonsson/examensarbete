@@ -46,44 +46,42 @@ parse(Data) ->
 %printTokens([]) -> [];
 %printTokens(Tokens) -> hd(Tokens).
 
-hej(T) -> T.
-
 % parses data to event record
-parseData_new([ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId]) ->
-  %io:format(ReportingNode),
-  %io:format("~n"),
-  %io:format(Tokens),
-  Event = #non_relational_event{reportingNode = ReportingNode,
-      reportingTs = ReportingTs,
-      eventTs = EventTs,
-      eventType = EventType,
-      hMcc = HMcc,
-      hMnc = HMnc,
-      hashedImsi = HashedImsi,
-      vMcc = VMcc,
-      vMnc = VMnc,
-      rat = Rat,
-      cellName = CellName,
-      gsmLac = GsmLac,
-      gsmCid = GsmCid,
-      umtsLac = UmtsLac,
-      umtsSac = UmtsSac,
-      umtsRncId = UmtsRncId,
-      umtsCi = UmtsCi,
-      lteEnodeBId = LteEnodeBId,
-      lteCi = LteCi,
-      cellPortionId = CellPortionId,
-      locationEstimateShape = LocationEstimateShape,
-      locationEstimateLat = LocationEstimateLat,
-      locationEstimateLon = LocationEstimateLon,
-      locationEstimateRadius = LocationEstimateRadius,
-      crmGender = CrmGender,
-      crmAgeGroup = CrmAgeGroup,
-      crmZipCode = CrmZipCode,
-      presencePointId = PresencePointId,
-      groupPresencePointId = GroupPresencePointId
-    },
-  db_nonrelational:write_new(Event).
+%parseData_new([ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId]) ->
+%  %io:format(ReportingNode),
+%  %io:format("~n"),
+%  %io:format(Tokens),
+%  Event = #non_relational_event{reportingNode = ReportingNode,
+%      reportingTs = ReportingTs,
+%      eventTs = EventTs,
+%      eventType = EventType,
+%      hMcc = HMcc,
+%      hMnc = HMnc,
+%      hashedImsi = HashedImsi,
+%      vMcc = VMcc,
+%      vMnc = VMnc,
+%      rat = Rat,
+%      cellName = CellName,
+%      gsmLac = GsmLac,
+%      gsmCid = GsmCid,
+%      umtsLac = UmtsLac,
+%      umtsSac = UmtsSac,
+%      umtsRncId = UmtsRncId,
+%      umtsCi = UmtsCi,
+%      lteEnodeBId = LteEnodeBId,
+%      lteCi = LteCi,
+%      cellPortionId = CellPortionId,
+%      locationEstimateShape = LocationEstimateShape,
+%      locationEstimateLat = LocationEstimateLat,
+%      locationEstimateLon = LocationEstimateLon,
+%      locationEstimateRadius = LocationEstimateRadius,
+%      crmGender = CrmGender,
+%      crmAgeGroup = CrmAgeGroup,
+%      crmZipCode = CrmZipCode,
+%      presencePointId = PresencePointId,
+%      groupPresencePointId = GroupPresencePointId
+%    },
+%  db_nonrelational:write_new(Event).
 
 
 % parses data to event record

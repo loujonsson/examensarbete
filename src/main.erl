@@ -10,12 +10,12 @@
 -author("lou").
 
 %% API
--export([run_nonrelational/1, run_relational/1]).
+-export([nonrelational_run/1, relational_run/1]).
 
 % take file as input, go through data and put in non-relational database
-run_nonrelational(File) ->
+nonrelational_run(File) ->
   fileProcessor_nonrelational:receiveFile(File).
 
 % take file as input, go through data and put in relational database
-run_relational(File) ->
+relational_run(File) ->
   fileProcessor_relational:receiveFile(File).
