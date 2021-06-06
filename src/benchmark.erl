@@ -29,8 +29,10 @@ benchmarkFileRelational(Filename) ->
 
 
 
-benchmarkSearchRelational(Filename) ->
- 
+benchmarkSearchRelational() ->
+  queryHandler:queryInit(),
+  queryHandler:receiveQueryAttribute({"gender", "1"}), % exempel
+  queryHandler:receiveValidCommand("done").
 
 
 
