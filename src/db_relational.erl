@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([install/1, start/2, stop/1, fetchLastEvent/0, write_event/11, write_sim_card_information/6, write_cell/6, write_radio_access_type/2, write_gsm/3, write_umts/5, write_lte/3, traverse_table_and_show/1, read_test/1, clearAllTables/0, select_test/1]).
+-export([install/1, start/2, stop/1, fetchLastEvent/0, write_event/11, write_sim_card_information/6, write_cell/6, write_radio_access_type/2, write_gsm/3, write_umts/5, write_lte/3, traverse_table_and_show/1, read_test/1, clearAllTables/0, select_test/1, select/3]).
 -include("main.hrl").
 
 
@@ -219,4 +219,41 @@ select_test(RatTypeId)->
   end,
   mnesia:activity(transaction,F).
   
+
+
+
+select(Table_name, AttributeType, Attribute) ->
+  MatchHead = case AttributeType of
+    "zipCode" -> select_zipCode(Attribute);
+    "gender" -> select_gender(Attribute);
+    "ageGroup" -> select_ageGroup(Attribute)
+  end,
+  mnesia:dirty_select(Table_name, [{MatchHead, [], ['$6']}]).
+
+select_zipCode(ZipCode) ->
+  #sim_card_information{
+          hashedImsi = '$6',
+          gender = '$23',
+          ageGroup = '$24',
+          zipCode = ZipCode,
+          _ = '_'
+        }.
+
+select_ageGroup(AgeGroup) ->
+  #sim_card_information{
+          hashedImsi = '$6',
+          gender = '$23',
+          ageGroup = AgeGroup,
+          zipCode = '$25',
+          _ = '_'
+        }.
+
+select_gender(Gender) ->
+  #sim_card_information{
+          hashedImsi = '$6',
+          gender = Gender,
+          ageGroup = '$24',
+          zipCode = '$25',
+          _ = '_'
+        }.
 

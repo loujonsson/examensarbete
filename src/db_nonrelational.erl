@@ -10,11 +10,10 @@
 -author("lou").
 
 %% API
--export([install/1, write/29, write_dirty/29, write_testEvent/0, traverse_table_and_show/1, select/3,clearAllTables/0,write_new/1]).
+-export([install/1, write/29, write_dirty/29, write_testEvent/0, traverse_table_and_show/1, select/3,clearAllTables/0]).
 -include("main.hrl").
 
-% -include_lib("stdlib/include/qlc.hrl").
-
+% configure database table in nonrelational database
 install(Nodes) ->
   ok = mnesia:create_schema(Nodes),
   application:start(mnesia),
@@ -22,12 +21,9 @@ install(Nodes) ->
     [{attributes, record_info(fields, non_relational_event)},
       %{index, [#non_relational_event.hashedImsi, #non_relational_event.reportingTs]},
       {disc_copies, Nodes}]).
-      
-  %    mnesia:create_table(mini_event,
-  %  [{attributes, record_info(fields, mini_event)},
-  %    %{index, [#non_relational_event.hashedImsi, #non_relational_event.reportingTs]},
-  %    {disc_copies, Nodes}]).
 
+
+% write a test event to database
 write_testEvent() ->
   EventTest = #non_relational_event{reportingNode = 'reportingN1',
     reportingTs = 1538388005000123,
@@ -59,7 +55,6 @@ write_testEvent() ->
     %presencePointId = PresencePointId,
     %groupPresencePointId = GroupPresencePointId},
   },
-  %mnesia:dirty_write(Event),
   mnesia:dirty_write(EventTest).
 
 % dirty write to non relational database
@@ -133,13 +128,6 @@ write(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc
     })
   end, 
   mnesia:transaction(F).
-  %ok
-  %    end,
-  %State = mnesia:activity(transaction, F),
-  %State.
-
-  %timer:sleep(100).
-  %mnesia:info().
 
 
 %write(Event) ->
@@ -163,24 +151,13 @@ write(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc
   %mnesia:info().
 
 
-  
-
-
-write_new(Event) ->
-  timer:sleep(10),
-    F = fun() ->
-    mnesia:write(non_relational_event, Event, write)
-      end,
-  mnesia:activity(transaction, F).
-  
-
 select(Table_name, AttributeType, Attribute) ->
   MatchHead = case AttributeType of
     "zipCode" -> select_zipCode(Attribute);
     "gender" -> select_gender(Attribute);
     "ageGroup" -> select_ageGroup(Attribute)
   end,
-  mnesia:dirty_select(Table_name, [{MatchHead, [], ['$1']}]).
+  mnesia:dirty_select(Table_name, [{MatchHead, [], ['$6']}]).
 
 select_zipCode(ZipCode) ->
   #non_relational_event{reportingNode = '$1',

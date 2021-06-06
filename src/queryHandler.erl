@@ -16,14 +16,14 @@
 -author("lou").
 
 %% API
--export([receiveValidCommand/1, receiveQueryAttribute/1, queryInit/0, attributesInit/0, fetchEts/2, showTable/0, fetchEtsData/2]).
+-export([receiveValidCommand/1, receiveQueryAttribute/1, queryInit/0, attributesInit/0, fetchEts/2, fetchEtsData/2]).
 
 % initializes query with an ets table
 queryInit() ->
-  ets:new(query, [named_table, public, set, {keypos, 1}]),
-  ets:insert(query, {"gender", {}}), %{0,1,2}
-  ets:insert(query, {"ageGroup", {}}), %{0,1,2,3,4,5,6}
-  ets:insert(query, {"zipCode", {}}).
+  ets:new(query, [named_table, public, set, {keypos, 1}]).
+  %ets:insert(query, {"gender", {}}), %{0,1,2}
+  %ets:insert(query, {"ageGroup", {}}), %{0,1,2,3,4,5,6}
+  %ets:insert(query, {"zipCode", {}}).
 
 % initializes statistics attributes with an ets table
 attributesInit() ->
@@ -56,9 +56,9 @@ receiveValidCommand(Command) ->
   case Command of
     done ->
       Query = formatQuery(),
-      resetAllQueries(),
-      receiveDone(Query),
-      outputFileProcessor:generateOutputFile();
+      clearQuery(),
+      Results = receiveDone(Query),
+      outputFileProcessor_bench:generateOutputFile(Results);
     clear -> clearQuery()
     %_ -> setNewAttributeQuery(Tokens)
   end.
@@ -91,28 +91,34 @@ formatQuery() ->
 % Calls function which extracts query attributes from list Query
 receiveDone(Query) -> 
   io:format("Received done.~n"),
-  getElementsFromList(Query).
+  ResultsTuple = getElementsFromList(Query),
+  ResultsTuple.
 
 
 % Extracts data from list
 getElementsFromList([]) -> [];
 getElementsFromList([{AttributeType, Attribute}]) -> 
-  %getDataFromNonRelationalDb(AttributeType, Attribute);
-  getDataFromRelationalDb(AttributeType, Attribute);
+  HashedImsis = getDataFromNonRelationalDb(AttributeType, Attribute),
+  {AttributeType, Attribute, HashedImsis};
+  %HashedImsis = getDataFromRelationalDb(AttributeType, Attribute),
+  %{AttributeType, Attribute, HashedImsis};
+  %getDataFromRelationalDb(AttributeType, Attribute);
 getElementsFromList([_| T]) ->
   getElementsFromList(T).
 
 
 % Searches for the selected AttributeType with attribute Attribute from database (nonrelational)
 getDataFromNonRelationalDb(AttributeType, Attribute) ->
-  Data = db_nonrelational:select(non_relational_event, AttributeType, Attribute),
-  countOccurrences(Data).
+  UniqueHashedImsis = db_nonrelational:select(non_relational_event, AttributeType, Attribute),
+  UniqueHashedImsis.
+  %countOccurrences(Data).
 
 
 % Searches for the selected AttributeType with attribute Attribute from database (relational)
 getDataFromRelationalDb(AttributeType, Attribute) ->
-  Data = db_relational:select(relational_event, AttributeType, Attribute),
-  countOccurrences(Data).
+  UniqueHashedImsis = db_relational:select(sim_card_information, AttributeType, Attribute),
+  UniqueHashedImsis.
+  %countOccurrences(Data).
 
 
 % count total occurrences and store in attributes ets table
