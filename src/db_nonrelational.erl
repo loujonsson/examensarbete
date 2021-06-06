@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([install/1, write/29, write_dirty/29, write_testEvent/0, traverse_table_and_show/1, select/3, select_all/0,clearAllTables/0,write_new/1]).
+-export([install/1, write/29, write_dirty/29, write_testEvent/0, traverse_table_and_show/1, select/3,clearAllTables/0,write_new/1]).
 -include("main.hrl").
 
 % -include_lib("stdlib/include/qlc.hrl").
@@ -251,15 +251,15 @@ select_gender(Gender) ->
 %  {atomic, Result} = mnesia:transaction(F),
 %  Result.
 
-select_all() ->
-  {atomic, Data} = mnesia:transaction(
-    fun() ->
-      qlc:eval(
-        qlc:q([X || X <- mnesia:table(event)], {unique, true})
-      )
-    end
-  ),
-  Data.
+%select_all() ->
+%  {atomic, Data} = mnesia:transaction(
+%    fun() ->
+%      qlc:eval(
+%        qlc:q([X || X <- mnesia:table(event)], {unique, true})
+%      )
+%    end
+%  ),
+%  Data.
 
 %select_distinct(ZipCode) ->
 %  MatchHead = #non_relational_event{%reportingNode = '$1',

@@ -138,7 +138,7 @@ receiveDone(Query) -> io:format("received done.~n"),
 %io:format(Query).
 
 getElementsFromList([]) -> [];
-getElementsFromList([{AttributeType, Attribute}]) -> {AttributeType, Attribute},
+getElementsFromList([{AttributeType, Attribute}]) -> %{AttributeType, Attribute},
   %case H of
     %"zipCode" -> ignore;
   %  _ -> getDataFromDb(Attribute)
