@@ -103,7 +103,6 @@ write(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc
       hashedImsi = HashedImsi,
       reportingTs = ReportingTs,
       reportingNode = ReportingNode,
-      
       eventTs = EventTs,
       eventType = EventType,
       hMcc = HMcc,

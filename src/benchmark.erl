@@ -10,23 +10,33 @@
 -author("ant").
 
 %% API
--export([autoloopbenchmark/0,stdv/1,mean/1, sumPowerByTwo/2,benchmarkCustomeInput/2,loopClassTime/1,autoInputNonRelational/0,autoInputRelational/0,benchmarkFileNonRelational/1]).
+-export([autoloopbenchmark/0,stdv/1,mean/1, sumPowerByTwo/2,benchmarkCustomeInput/2,autoNonRelational/0,autoRelational/0,benchmarkFileNonRelational/1]).
 
 
 benchmarkFileNonRelational(Filename) ->
-  mnesia:info(),
   db_nonrelational:clearAllTables(),
   Start = os:timestamp(),
-  main:run_nonrelational(Filename),
+  main:nonrelational_run(Filename),
   Time=timer:now_diff(os:timestamp(), Start) / 1000000,
   Time.
 benchmarkFileRelational(Filename) ->
-  mnesia:info(),
-  improved_db_relational:clearAllTables(),
+  db_relational:clearAllTables(),
   Start = os:timestamp(),
-  main:run_relational(Filename),
+  main:relational_run(Filename),
   Time=timer:now_diff(os:timestamp(), Start) / 1000000,
   Time.
+
+
+
+
+benchmarkSearchRelational(Filename) ->
+ 
+
+
+
+
+
+
 
 %average(X) ->
 %  average(X, 0, 0).
@@ -58,32 +68,32 @@ stdv(NumberList) ->
 loopClass(Function,Parameter,NumberOfLoops,Num) ->
   ListOfValues=loopfunction(0, NumberOfLoops, Function,Parameter),
   [mean(ListOfValues),stdv(ListOfValues),Num/mean(ListOfValues)].
-loopClassTime(NumberRows) ->
-  Start = os:timestamp(),
-  loopfunction(0, NumberRows,fun testInputRelational/1 ,1),
-  Time=timer:now_diff(os:timestamp(), Start) / 1000,
-  Time.
+%loopClassTime(NumberRows) ->
+ % Start = os:timestamp(),
+  %loopfunction(0, NumberRows,fun benchmarkFileRelational/0 ,1),
+%  Time=timer:now_diff(os:timestamp(), Start) / 1000,
+%  Time.
 
-autoInputNonRelational() ->
+autoNonRelational() ->
   io:format("start file benchmark non-relational~n"),
   io:format("average time : standart deviation : rows per sec ~n"),
   Start = os:timestamp(),
-  io:format("1000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"1000m.csv",2,1000)),
-  io:format("2000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"1000m.csv",2,2000)),
-  io:format("3000,~f,~f,~f ~n",loopClass(fun benchmarkFileNonRelational/1,"3000m.csv",2,3000)),
-  io:format("4000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"4000m.csv",2,4000)),
-  io:format("5000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"5000m.csv",2,5000)),
-  io:format("6000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"6000m.csv",2,6000)),
-  io:format("7000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"7000m.csv",2,7000)),
-  io:format("8000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"8000m.csv",2,8000)),
-  io:format("9000,~f,~f,~f ~n",loopClass(fun benchmarkFileNonRelational/1,"9000m.csv",2,9000)),
-  io:format("10000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"10000m.csv",2,10000)),
+  io:format("1000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"1000m.csv",300,1000)),
+  io:format("2000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"2000m.csv",300,2000)),
+  io:format("3000,~f,~f,~f ~n",loopClass(fun benchmarkFileNonRelational/1,"3000m.csv",300,3000)),
+  io:format("4000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"4000m.csv",300,4000)),
+  io:format("30000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"5000m.csv",300,5000)),
+  io:format("6000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"6000m.csv",300,6000)),
+  io:format("7000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"7000m.csv",300,7000)),
+  io:format("8000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"8000m.csv",300,8000)),
+  io:format("9000,~f,~f,~f ~n",loopClass(fun benchmarkFileNonRelational/1,"9000m.csv",300,9000)),
+  io:format("10000,~f,~f,~f~n",loopClass(fun benchmarkFileNonRelational/1,"10000m.csv",300,10000)),
   io:format("benchmark time:~f sek ~n",[timer:now_diff(os:timestamp(), Start) / 1000000]),
   io:format("done with benchmark~n").
-autoInputRelational() ->
+autoRelational() ->
   io:format("start file benchmark relational~n"),
   io:format("average time : standart deviation : rows per sec ~n"),
-  improved_db_relational:clearAllTables(),
+  db_relational:clearAllTables(),
   Start = os:timestamp(),
   io:format("1000,~f,~f,~f~n",loopClass(fun benchmarkFileRelational/1,"1000m.csv",50,1000)),
   io:format("2000,~f,~f,~f~n",loopClass(fun benchmarkFileRelational/1,"2000m.csv",50,2000)),
@@ -101,8 +111,8 @@ autoInputRelational() ->
 
 
 benchmarkCustomeInput(NumberOfRows,NumberOfTimes) ->
-  io:format("~p,",[NumberOfRows]),
-  io:format("~f,~f,~f ~n",loopClass(fun loopClassTime/1,NumberOfRows,NumberOfTimes,NumberOfRows)).
+  io:format("~p,",[NumberOfRows]).
+  %io:format("~f,~f,~f ~n",loopClass(fun loopClassTime/1,NumberOfRows,NumberOfTimes,NumberOfRows)).
 
 loop(1000) ->
   ok;

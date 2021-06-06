@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 24. May 2021 17:12
 %%%-------------------------------------------------------------------
--module(improved_db_relational).
+-module(db_relational).
 -author("lou").
 
 %% API
