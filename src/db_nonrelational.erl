@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([install/1, write/29, write_dirty/29, traverse_table_and_show/1, select/3, select_all/0,clearAllTables/0]).
+-export([install/1, write/29, write_dirty/29, write_testEvent/0, traverse_table_and_show/1, select/3, select_all/0,clearAllTables/0,write_new/1]).
 -include("main.hrl").
 
 % -include_lib("stdlib/include/qlc.hrl").
@@ -22,15 +22,20 @@ install(Nodes) ->
     [{attributes, record_info(fields, non_relational_event)},
       %{index, [#non_relational_event.hashedImsi, #non_relational_event.reportingTs]},
       {disc_copies, Nodes}]).
+      
+  %    mnesia:create_table(mini_event,
+  %  [{attributes, record_info(fields, mini_event)},
+  %    %{index, [#non_relational_event.hashedImsi, #non_relational_event.reportingTs]},
+  %    {disc_copies, Nodes}]).
 
 write_testEvent() ->
   EventTest = #non_relational_event{reportingNode = 'reportingN1',
-    reportingTs = 1538388005000,
+    reportingTs = 1538388005000123,
     eventTs = 153838800000,
     eventType = 1,
     hMcc = 240,
     hMnc = 10,
-    hashedImsi = 'AB502941AFE134',
+    hashedImsi = 'AB502941AFE132',
     vMcc = 240,
     vMnc = 10,
     rat = 3,
@@ -57,6 +62,7 @@ write_testEvent() ->
   %mnesia:dirty_write(Event),
   mnesia:dirty_write(EventTest).
 
+% dirty write to non relational database
 write_dirty(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId) ->
   mnesia:dirty_write(#non_relational_event{reportingNode = ReportingNode,
       reportingTs = ReportingTs,
@@ -89,16 +95,19 @@ write_dirty(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMc
       groupPresencePointId = GroupPresencePointId
     }).
 
-
+% write to non relational db with transactions
 write(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId) ->
   F = fun() ->
-    mnesia:write(#non_relational_event{reportingNode = ReportingNode,
+    %mnesia:write_lock_table(non_relational_event),
+    mnesia:write(#non_relational_event{
+      hashedImsi = HashedImsi,
       reportingTs = ReportingTs,
+      reportingNode = ReportingNode,
+      
       eventTs = EventTs,
       eventType = EventType,
       hMcc = HMcc,
       hMnc = HMnc,
-      hashedImsi = HashedImsi,
       vMcc = VMcc,
       vMnc = VMnc,
       rat = Rat,
@@ -122,9 +131,48 @@ write(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc
       presencePointId = PresencePointId,
       groupPresencePointId = GroupPresencePointId
     })
+  end, 
+  mnesia:transaction(F).
+  %ok
+  %    end,
+  %State = mnesia:activity(transaction, F),
+  %State.
+
+  %timer:sleep(100).
+  %mnesia:info().
+
+
+%write(Event) ->
+%  F = fun() ->
+%    mnesia:write(Event)
+%  end,
+%  mnesia:activity(transaction, F).
+
+  % write to non relational db with transactions
+%write_mini(ReportingNode,EventType) ->
+%  io:format(ReportingNode),
+%  io:format("~n"),
+%  
+%  F = fun() ->
+%    mnesia:write(#mini_event{reportingNode = ReportingNode,
+%      eventType=EventType
+%    })
+%      end,
+%  mnesia:activity(transaction, F).
+  %timer:sleep(100).
+  %mnesia:info().
+
+
+  
+
+
+write_new(Event) ->
+  timer:sleep(10),
+    F = fun() ->
+    mnesia:write(non_relational_event, Event, write)
       end,
   mnesia:activity(transaction, F).
-
+  
 
 select(Table_name, AttributeType, Attribute) ->
   MatchHead = case AttributeType of
