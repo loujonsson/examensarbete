@@ -10,7 +10,7 @@
 -author("ant").
 
 %% API
--export([autoloopbenchmark/0,stdv/1,mean/1, sumPowerByTwo/2,benchmarkCustomeInput/2,autoNonRelational/0,autoRelational/0,benchmarkFileNonRelational/1]).
+-export([benchmarkFileRelational/1,autoSearchNonRelational/1,benchmarkSearchNonRelational/1,autoloopbenchmark/0,stdv/1,mean/1, sumPowerByTwo/2,benchmarkCustomeInput/2,autoNonRelational/0,autoRelational/0,benchmarkFileNonRelational/1]).
 
 
 benchmarkFileNonRelational(Filename) ->
@@ -29,17 +29,20 @@ benchmarkFileRelational(Filename) ->
 
 
 
-benchmarkSearchRelational() ->
+
+
+benchmarkSearchNonRelational(String) ->
+  Start = os:timestamp(),
   queryHandler:queryInit(),
   queryHandler:receiveQueryAttribute({"gender", "1"}), % exempel
-  queryHandler:receiveValidCommand("done").
-
-
-
-
-
-
-
+  queryHandler:receiveValidCommand(done),
+  queryHandler:receiveQueryAttribute({"zipCode", "46891"}), % exempel
+  queryHandler:receiveValidCommand(done),
+  queryHandler:receiveQueryAttribute({"ageGroup", "2"}), % exempel
+  queryHandler:receiveValidCommand(done),
+  Time=timer:now_diff(os:timestamp(), Start) / 1000000,
+  ets:delete(query),
+  Time.
 %average(X) ->
 %  average(X, 0, 0).
 %average([H|T], Length, Sum) ->
@@ -112,10 +115,19 @@ autoRelational() ->
   io:format("done with benchmark~n").
 
 
+autoSearchNonRelational(Filename) ->
+  %db_relational:clearAllTables(),
+  %main:nonrelational_run(Filename),
+  ListOfValues=loopfunction(0, 200, fun benchmarkSearchNonRelational/1,""),
+  mean(ListOfValues).
+
+
+
+
+
 benchmarkCustomeInput(NumberOfRows,NumberOfTimes) ->
   io:format("~p,",[NumberOfRows]).
   %io:format("~f,~f,~f ~n",loopClass(fun loopClassTime/1,NumberOfRows,NumberOfTimes,NumberOfRows)).
-
 loop(1000) ->
   ok;
 loop(Count) ->
