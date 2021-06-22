@@ -150,7 +150,7 @@ write(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc
   %timer:sleep(100).
   %mnesia:info().
 
-
+% select from database depending on attribute type and attribute from user.
 select(Table_name, AttributeType, Attribute) ->
   MatchHead = case AttributeType of
     "zipCode" -> select_zipCode(Attribute);
