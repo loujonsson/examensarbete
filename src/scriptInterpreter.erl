@@ -29,7 +29,8 @@
 initProgram() ->
   queryHandler:queryInit(),
   queryHandler:attributesInit(),
-  getQueryFromUser().
+  specifyCounterType().
+
 %receiveHeader(headList) ->
 %    io:format(headList).
 
@@ -37,26 +38,38 @@ initProgram() ->
 
 % {attrbiute, zipCode}, matcha stärng mot atom
 
+% user must specify if the wanted statistics should be total or unique
+specifyCounterType() ->
+  Input = io:get_line("Please specify wished statistics 'total' or 'unique':\n"),
+  Tokens = string:tokens(Input, "\n."),
+  case hd(Tokens) of 
+    "total" -> 
+      queryHandler:receiveValidCommand(total),
+      getQueryFromUser();
+    "unique" -> 
+      queryHandler:receiveValidCommand(unique),
+      getQueryFromUser();
+    _ -> specifyCounterType()
+  end.
+  
+
 getQueryFromUser() ->
-  Input = io:get_line(io:format("Set values on attributes~n")),
+  Input = io:get_line("Set values on attributes\n"),
   Tokens = string:tokens(Input, ";=\n."),
   Command = processTokens(Tokens),
   case testnumCheckValidAttribute(Command) of
     true ->
-     io:format("valid input~n"),
+     "valid input\n",
      queryHandler:receiveQueryAttribute(Command),
      getQueryFromUser();
     false->
-      io:format("invalid command~n"),
+      "invalid command\n",
       getQueryFromUser();
     clear ->
-      io:format("reset program~n"),
+      "reset program\n",
       queryHandler:receiveValidCommand(clear);
-    clear ->
-      io:format("set period~n"),
-      periodSetup();
     done ->
-      io:format("exit program"),
+      "exit program",
       queryHandler:receiveValidCommand(done)
   end.
 
@@ -115,9 +128,13 @@ testnumCheckValidAttribute({AttributeType, Attribute}) ->
     "zipCode" ->
       checkValidNumber(Attribute,9999,999999);% improve
     "gender" ->
-      checkValidNumber(Attribute,0,2);
+      checkValidNumber(Attribute,0,3);
     "ageGroup" ->
-      checkValidNumber(Attribute,0,2);
+      checkValidNumber(Attribute,0,6);
+    "hMcc" ->
+      true;
+    "hMnc" ->
+      true;
     _ ->
       false
   end.

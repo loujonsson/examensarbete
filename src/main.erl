@@ -14,7 +14,7 @@
 
 % take file as input, go through data and put in non-relational database
 nonrelational_run(File) ->
-  fileProcessor_nonrelational:receiveFile(File).
+  fileProcessor:receiveFile(File).
 
 % take file as input, go through data and put in relational database
 relational_run(File) ->
