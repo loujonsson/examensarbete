@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([install/1, write/29, write_dirty/29, write_testEvent/0, traverse_table_and_show/1, select/3,clearAllTables/0]).
+-export([install/1, write/29, write_dirty/29, write_testEvent/0, traverse_table_and_show/1, select/3,clearAllTables/0, select_new/0,fetchAttributesFromQuery/1]).
 -include("main.hrl").
 
 % configure database table in nonrelational database
@@ -208,18 +208,21 @@ receiveDone() ->
 % TODO: Fix "" -> dont go to select
 % else -> go to select
 fetchAttributesFromQuery(Attribute) ->
-  if ets:lookup(query, Attribute) == "" ->
+  LookUp = ets:lookup(query, Attribute),
+  if LookUp == "" ->
     '_';
-  true -> queryHandler:fetchEtsData(H).
+  true ->
+    queryHandler:fetchEtsData(query, Attribute)
+  end.
   
 
 select_new() ->
-  #non_relational_event{%reportingNode = '$1',
+  MatchHead = #non_relational_event{%reportingNode = '$1',
           %reportTs = '$2',
           %eventTs = '$3',
           %eventType = '$4',
-          hMcc = fetchAttributesFromQuery("hMcc"),
-          hMnc = fetchAttributesFromQuery("hMnc"),
+          hMcc = fetchAttributesFromQuery(hMcc),
+          hMnc = fetchAttributesFromQuery(hMnc),
           hashedImsi = '$6',
           %vMcc = '$7',
           %vMnc = '$8',
@@ -238,11 +241,13 @@ select_new() ->
           %locationEstimateLat = '$20',
           %locationEstimateLon = '$21',
           %locationEstimateRadius = '$22',
-          crmGender = fetchAttributesFromQuery("gender"),
-          crmAgeGroup = fetchAttributesFromQuery("ageGroup"),
-          crmZipCode = fetchAttributesFromQuery("zipCode"),
+          crmGender = fetchAttributesFromQuery(gender),
+          crmAgeGroup = fetchAttributesFromQuery(ageGroup),
+          crmZipCode = fetchAttributesFromQuery(zipCode),
           _ = '_'
-        }.
+        },
+        
+  mnesia:dirty_select(non_relational_event, [{MatchHead, [], ['$6']}]).
 
 
 
