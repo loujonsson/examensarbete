@@ -76,7 +76,26 @@ receiveValidCommand(Command) ->
 
 % receives valid query attribute from script interpreter
 receiveQueryAttribute({AttributeType, Attribute}) ->
-    setNewAttributeQuery({AttributeType, Attribute}).
+  setNewAttributeQuery({AttributeType, Attribute});
+receiveQueryAttribute([AttributeType, Year, Month, Date, Hour, Minute, Seconds]) ->
+  case AttributeType of
+    "startTimestamp" -> convertTime(periodStartTs, {{dataTypeConverter:string_to_integer(Year),dataTypeConverter:string_to_integer(Month),dataTypeConverter:string_to_integer(Date)},{dataTypeConverter:string_to_integer(Hour),dataTypeConverter:string_to_integer(Minute),dataTypeConverter:string_to_integer(Seconds)}});
+    "stopTimestamp" -> convertTime(periodStopTs, {{dataTypeConverter:string_to_integer(Year),dataTypeConverter:string_to_integer(Month),dataTypeConverter:string_to_integer(Date)},{dataTypeConverter:string_to_integer(Hour),dataTypeConverter:string_to_integer(Minute),dataTypeConverter:string_to_integer(Seconds)}})
+  end.
+
+
+%storeTime(AttributeType, Attribute) ->
+%  if 
+%    is_integer(Attribute) ->
+%      ets:insert(query, {AttributeType, {Attribute}});
+%    true -> 
+%      convertTime(AttributeType, Attribute)
+%  end.
+
+% Converts time given from user input to UTC time
+convertTime(AttributeType, Attribute) ->
+  UTCTime = timeHandler:convertTime(Attribute),
+  ets:insert(query, {AttributeType, {UTCTime}}).  
 
 
 % resets current query...

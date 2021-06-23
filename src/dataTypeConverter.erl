@@ -11,9 +11,12 @@
 -author("lou").
 
 %% API
--export([integer_to_string/1]).
+-export([integer_to_string/1, string_to_integer/1]).
 
 % Converts number (int) to a string representation
 integer_to_string(Number) ->
   lists:flatten(io_lib:format("~p", [Number])).
 
+string_to_integer(String) ->
+  {Integer, []} = string:to_integer(String),
+  Integer.

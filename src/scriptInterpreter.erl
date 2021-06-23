@@ -44,20 +44,19 @@ specifyCounterType() ->
   Tokens = string:tokens(Input, "\n."),
   case hd(Tokens) of 
     "total" -> 
-      queryHandler:receiveValidCommand(total),
-      getQueryFromUser();
+      queryHandler:receiveValidCommand(total);
     "unique" -> 
-      queryHandler:receiveValidCommand(unique),
-      getQueryFromUser();
+      queryHandler:receiveValidCommand(unique);
     _ -> specifyCounterType()
-  end.
+  end,
+  getQueryFromUser().
   
 
 getQueryFromUser() ->
   Input = io:get_line("Set values on attributes\n"),
-  Tokens = string:tokens(Input, ";=\n."),
+  Tokens = string:tokens(Input, ";=\n.:- "),
   Command = processTokens(Tokens),
-  case testnumCheckValidAttribute(Command) of
+    case testnumCheckValidAttribute(Command) of
     true ->
      "valid input\n",
      queryHandler:receiveQueryAttribute(Command),
@@ -76,7 +75,8 @@ getQueryFromUser() ->
 processTokens(Tokens) ->
   case Tokens of
     [SingleCommand] -> [SingleCommand];
-    [AttributeType, Attribute] -> {AttributeType, Attribute}
+    [AttributeType, Attribute] -> {AttributeType, Attribute};
+    _ -> Tokens
   end.
 
 testCheckValidAttribute([Element]) ->
@@ -103,6 +103,10 @@ testCheckValidAttribute({AttributeType, Attribute}) ->
     "hMcc" ->
       true;
     "hMnc" ->
+      true;
+    "startTimestamp" ->
+      true;
+    "stopTimestamp" ->
       true;
     _ ->
       false
@@ -137,7 +141,18 @@ testnumCheckValidAttribute({AttributeType, Attribute}) ->
       true;
     _ ->
       false
+  end;
+testnumCheckValidAttribute(List) ->
+  case hd(List) of
+    "startTimestamp" ->
+      true;
+    "stopTimestamp" ->
+      true;
+    _ ->
+      false
   end.
+
+
 checkValidNumber(Attribute,Min,Max) ->
   {Number, _} = string:to_integer(Attribute),
   if
@@ -147,7 +162,6 @@ checkValidNumber(Attribute,Min,Max) ->
 
 checkValidNumber2(Attribute,Min,Max) ->
 lists:member(Attribute, lists:seq(Min,Max)).
-
 
 
 periodSetup() ->

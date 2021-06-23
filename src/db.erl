@@ -59,9 +59,11 @@ write_testEvent() ->
 
 % dirty write to non relational database
 write_dirty(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId) ->
-  mnesia:dirty_write(#non_relational_event{reportingNode = ReportingNode,
+  {IntegerEventTs,[]} = string:to_integer(EventTs),
+  
+  mnesia:dirty_write(#non_relational_event{eventTs = IntegerEventTs,
+      reportingNode = ReportingNode,
       reportingTs = ReportingTs,
-      eventTs = EventTs,
       eventType = EventType,
       hMcc = HMcc,
       hMnc = HMnc,
@@ -220,7 +222,7 @@ fetchAttributesFromQuery(Attribute) ->
 select_unique(Table) ->
   MatchHead = #non_relational_event{%reportingNode = '$1',
           %reportTs = '$2',
-          %eventTs = '$3',
+          eventTs = '$3',
           %eventType = '$4',
           hMcc = fetchAttributesFromQuery("hMcc"),
           hMnc = fetchAttributesFromQuery("hMnc"),
@@ -248,9 +250,19 @@ select_unique(Table) ->
           presencePointId = fetchAttributesFromQuery("presencePointId"),
           _ = '_'
         },
-        
-  mnesia:dirty_select(Table, [{MatchHead, [], ['$6']}]).
 
+  %if 
+  %  queryHandler:fetchEtsData(query, periodStartTs) == [] orelse queryHandler:fetchEtsData(query, periodStopTs) == [] ->
+  %  exit(notRightFormatPeriod);
+  %true -> 
+  %  Guard = [{'>', '$3', queryHandler:fetchEtsData(query, periodStartTs)},{'<', '$3', queryHandler:fetchEtsData(query, periodStopTs)}]
+  %end,
+        
+  %mnesia:dirty_select(Table, [{MatchHead, [{'>', '$3', string:to_integer(queryHandler:fetchEtsData(query, periodStartTs))}, {'<', '$3', string:to_integer(queryHandler:fetchEtsData(query, periodStopTs))}], ['$3']}]).
+  mnesia:dirty_select(Table, [{MatchHead, [{'>', '$3', queryHandler:fetchEtsData(query, periodStartTs)},{'<', '$3', queryHandler:fetchEtsData(query, periodStopTs)}], ['$6']}]).
+
+% {'<', '$3', 15972694877600}
+% {'>', '$3', 0}
 
 % selects total occurrences with the specified attributes from the query
 select_total(Table) ->
