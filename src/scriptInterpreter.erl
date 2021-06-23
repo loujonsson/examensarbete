@@ -69,7 +69,7 @@ getQueryFromUser() ->
       "reset program\n",
       queryHandler:receiveValidCommand(clear);
     done ->
-      "exit program",
+      "exit program\n",
       queryHandler:receiveValidCommand(done)
   end.
 

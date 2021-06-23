@@ -245,6 +245,7 @@ select_unique(Table) ->
           crmGender = fetchAttributesFromQuery("gender"),
           crmAgeGroup = fetchAttributesFromQuery("ageGroup"),
           crmZipCode = fetchAttributesFromQuery("zipCode"),
+          presencePointId = fetchAttributesFromQuery("presencePointId"),
           _ = '_'
         },
         
