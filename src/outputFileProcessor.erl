@@ -16,7 +16,7 @@
 
 %%% output file grejer:
 generateOutputFile() ->
-  openFile("write").
+  openFile(write).
 
 openFile(Mode) ->
   Io = case file:open("outputFileTest.txt", Mode) of
@@ -25,7 +25,7 @@ openFile(Mode) ->
   end,
 
   case Mode of
-    "write" -> writeToFile(Io);
+    write -> writeToFile(Io);
     "read" -> readHeader(Io)
   end.
 
@@ -37,14 +37,24 @@ writeToFile(IoDevice) ->
   Data,
   file:write_file("outputFileTest.txt", Data).
 
+fetchAttributesFromQuery(Attribute) ->
+  LookUp = ets:lookup(query, Attribute),
+  if LookUp == "" ->
+    "";
+  true ->
+    queryHandler:fetchEtsData(query, Attribute)
+  end.
+  
+
 formatData() ->
   %reportingNode,reportTs,eventType,counterValue,counterType,periodStartTs,periodStopTs,statId,statIndex,presencePointId,presencePointIdType,minPresenceNo,hMcc,hMnc,crmGender,crmAgeGroup,crmZipCode,maxPresenceNo,presencePointId2,presencePointId2Type,minDwellTimeCrit,maxDwellTimeCrit,subCat,dayCat,timeCatCRLF
   OutputRecord = #output{reportingNode = "reportingNode1",
-    reportTs = "1538388005000",
+    reportingTs = dataTypeConverter:integer_to_string(timeHandler:getNowTimeInUTC()),
     eventType = "3",
-    %counterValue = queryHandler:fetchEtsData(attributes, "counterValue"),
+    counterValue = queryHandler:fetchEtsData(attributes, counterValue),
     %counterValue = "123",
-    %counterType = queryHandler:fetchEtsData(attributes, "counterType"),
+    %counterType = "3",
+    counterType = queryHandler:fetchEtsData(attributes, counterType),
     periodStartTs = "",
     periodStopTs = "",
     statId = "",
@@ -52,8 +62,8 @@ formatData() ->
     presencePointId = "",
     presencePointIdType = "",
     minPresenceNo = "",
-    hMcc = "",
-    hMnc = "",
+    hMcc = queryHandler:fetchEtsData(query, "hMcc"),
+    hMnc = queryHandler:fetchEtsData(query, "hMnc"),
     crmGender = queryHandler:fetchEtsData(query, "gender"),
     crmAgeGroup = queryHandler:fetchEtsData(query, "ageGroup"),
     crmZipCode = queryHandler:fetchEtsData(query, "zipCode"),
@@ -77,10 +87,10 @@ formatData() ->
   %io:format(OutputRecord#output.counterValue),
   % varför ens göra en record då?
   OutputFileDataList = [OutputRecord#output.reportingNode,
-    OutputRecord#output.reportTs,
+    OutputRecord#output.reportingTs,
     OutputRecord#output.eventType,
-    %OutputRecord#output.counterValue,
-    %OutputRecord#output.counterType,
+    OutputRecord#output.counterValue,
+    OutputRecord#output.counterType,
     OutputRecord#output.periodStartTs,
     OutputRecord#output.periodStopTs,
     OutputRecord#output.statId,

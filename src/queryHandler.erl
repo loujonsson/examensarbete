@@ -28,8 +28,8 @@ queryInit() ->
 % initializes statistics attributes with an ets table
 attributesInit() ->
   ets:new(attributes, [named_table, public, set, {keypos, 1}]),
-  ets:insert(attributes, {counterType, {0}}),
-  ets:insert(attributes, {counterValue, {0}}).
+  ets:insert(attributes, {counterType, {"0"}}),
+  ets:insert(attributes, {counterValue, {"0"}}).
 
 
 % fetch ets data depending on ets table name Name and attribute inside of ets table LookupArg
@@ -41,12 +41,18 @@ fetchEts(Name, LookupArg) ->
 % returns the data in ets table Name with attribute LookupArg
 fetchEtsData(Name, LookupArg) ->
   %List = ets:lookup(Name, LookupArg),
-  [{_, Data}] = ets:lookup(Name, LookupArg),
-  case Data of 
-    {} -> ""; % maybe remove?
+  %LookUpData = 
+    case ets:lookup(Name, LookupArg) of 
+    [{_, {Data}}] -> Data;
     [] -> "";
-    Data -> Data
+    _ -> exit(fetchEtsDataError)
   end.
+  
+  %case LookUpData of 
+  %  {} -> ""; % maybe remove?
+  %  [] -> "";
+  %  LookUpData -> LookUpData
+  %end.
 
 
 % receive valid command from script interpreter
@@ -55,10 +61,12 @@ fetchEtsData(Name, LookupArg) ->
 receiveValidCommand(Command) ->
   case Command of
     done ->
-      Query = formatQuery(),
-      clearQuery(),
-      Results = receiveDone(Query),
-      outputFileProcessor_bench:generateOutputFile(Results);
+      %Query = formatQuery(),
+      getDataFromNonRelationalDb("lol", "hej"),
+      outputFileProcessor:generateOutputFile();
+      %clearQuery();
+      %Results = receiveDone(Query),
+      %outputFileProcessor_bench:generateOutputFile(Results);
     clear -> clearQuery()
     %_ -> setNewAttributeQuery(Tokens)
   end.
@@ -79,7 +87,9 @@ clearQuery() ->
 
 % sets new query attribute in ets table
 setNewAttributeQuery({AttributeType, Attribute}) ->
-  ets:insert(query, {AttributeType, Attribute}).
+  io:format(AttributeType),
+  io:format(Attribute),
+  ets:insert(query, {AttributeType, {Attribute}}).
 
 
 % format query in ets table to list
@@ -109,9 +119,8 @@ getElementsFromList([_| T]) ->
 
 % Searches for the selected AttributeType with attribute Attribute from database (nonrelational)
 getDataFromNonRelationalDb(AttributeType, Attribute) ->
-  UniqueHashedImsis = db_nonrelational:select(non_relational_event, AttributeType, Attribute),
-  UniqueHashedImsis.
-  %countOccurrences(Data).
+  UniqueHashedImsis = db:select_new(non_relational_event),
+  countOccurrences(UniqueHashedImsis).
 
 
 % Searches for the selected AttributeType with attribute Attribute from database (relational)
@@ -124,11 +133,6 @@ getDataFromNonRelationalDb(AttributeType, Attribute) ->
 % count total occurrences and store in attributes ets table
 countOccurrences(Data) ->
   Length = length(Data),
-  TotalOccurrences = to_string(Length),
+  TotalOccurrences = dataTypeConverter:integer_to_string(Length),
   ets:insert(attributes, {counterValue, {TotalOccurrences}}).
-
-
-% Converts number (int) to a string representation
-to_string(Number) ->
-  lists:flatten(io_lib:format("~p", [Number])).
 

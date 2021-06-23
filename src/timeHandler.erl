@@ -11,6 +11,23 @@
 -author("lou").
 
 %% API
--export([getTimeNow/0]).
+-export([getUniversalTimeNow/0, getNowTimeInUTC/0]).
 
-getTimeNow() ->
+
+% returns the current time in milliseconds from 1970-01-01, UTC time.
+getNowTimeInUTC() ->
+    Now = getUniversalTimeNow(),
+    timeConverter(Now).
+
+
+% time in 
+getUniversalTimeNow() ->
+    calendar:now_to_universal_time(erlang:timestamp()).
+
+
+% converts time from specified year, month, day, hour, minute and seconds to milliseconds. 
+timeConverter({{Year,Month,Day},{Hours,Minutes,Seconds}} = SpecifiedTime) ->
+  TimeInMs=(calendar:datetime_to_gregorian_seconds(
+    SpecifiedTime
+  ) - 62167219200)*1000000,
+  TimeInMs.
