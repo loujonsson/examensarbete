@@ -43,7 +43,7 @@ fetchEtsData(Name, LookupArg) ->
   %List = ets:lookup(Name, LookupArg),
   [{_, Data}] = ets:lookup(Name, LookupArg),
   case Data of 
-    {} -> "";
+    {} -> ""; % maybe remove?
     [] -> "";
     Data -> Data
   end.
@@ -115,10 +115,10 @@ getDataFromNonRelationalDb(AttributeType, Attribute) ->
 
 
 % Searches for the selected AttributeType with attribute Attribute from database (relational)
-getDataFromRelationalDb(AttributeType, Attribute) ->
-  UniqueHashedImsis = db_relational:select(sim_card_information, AttributeType, Attribute),
-  UniqueHashedImsis.
-  %countOccurrences(Data).
+%getDataFromRelationalDb(AttributeType, Attribute) ->
+%  UniqueHashedImsis = db_relational:select(sim_card_information, AttributeType, Attribute),
+%  UniqueHashedImsis.
+%  %countOccurrences(Data).
 
 
 % count total occurrences and store in attributes ets table
