@@ -35,7 +35,7 @@ readHeader(IoDevice) ->
 writeToFile(IoDevice) ->
   Data = formatData(),
   Data,
-  file:write_file("outputFileTest.txt", Data).
+  file:write_file("outputFileTest.csv", Data).
 
 fetchAttributesFromQuery(Attribute) ->
   LookUp = ets:lookup(query, Attribute),

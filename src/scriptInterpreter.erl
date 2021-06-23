@@ -29,13 +29,27 @@
 initProgram() ->
   queryHandler:queryInit(),
   queryHandler:attributesInit(),
-  getQueryFromUser().
+
+  specifyCounterType(),
+
 %receiveHeader(headList) ->
 %    io:format(headList).
 
 % använda tupler istället
 
 % {attrbiute, zipCode}, matcha stärng mot atom
+
+% user must specify if the wanted statistics should be total or unique
+specifyCounterType() ->
+  Input = io:get_line(io:format("Please specify wished statistics 'total' or 'unique':~n")),
+  case Input of 
+    "total" -> queryHandler:receiveValidCommand(total);
+    "unique" -> queryHandler:receiveValidCommand(unique);
+    _ -> specifyCounterType()
+  end,
+
+  getQueryFromUser().
+  
 
 getQueryFromUser() ->
   Input = io:get_line(io:format("Set values on attributes~n")),

@@ -28,7 +28,7 @@ queryInit() ->
 % initializes statistics attributes with an ets table
 attributesInit() ->
   ets:new(attributes, [named_table, public, set, {keypos, 1}]),
-  ets:insert(attributes, {counterType, {"0"}}),
+  %ets:insert(attributes, {counterType, {"0"}}),
   ets:insert(attributes, {counterValue, {"0"}}).
 
 
@@ -60,6 +60,8 @@ fetchEtsData(Name, LookupArg) ->
 % 'clear' means reset current query
 receiveValidCommand(Command) ->
   case Command of
+    otal -> ets:insert(attribute, {counterType, {"0"}});
+    unique -> ets:insert(attribute, {counterType, {"1"}});
     done ->
       %Query = formatQuery(),
       getDataFromNonRelationalDb("lol", "hej"),
