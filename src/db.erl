@@ -293,6 +293,7 @@ select_total(Table) ->
           crmGender = fetchAttributesFromQuery("gender"),
           crmAgeGroup = fetchAttributesFromQuery("ageGroup"),
           crmZipCode = fetchAttributesFromQuery("zipCode"),
+          presencePointId = fetchAttributesFromQuery("presencePointId"),
           _ = '_'
         },
         

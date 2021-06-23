@@ -108,6 +108,8 @@ testCheckValidAttribute({AttributeType, Attribute}) ->
       true;
     "stopTimestamp" ->
       true;
+    "presencePointId" ->
+      true;
     _ ->
       false
   end.
