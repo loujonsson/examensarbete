@@ -52,6 +52,9 @@ getQueryFromUser() ->
     clear ->
       io:format("reset program~n"),
       queryHandler:receiveValidCommand(clear);
+    clear ->
+      io:format("set period~n"),
+      periodSetup();
     done ->
       io:format("exit program"),
       queryHandler:receiveValidCommand(done)
@@ -84,6 +87,10 @@ testCheckValidAttribute({AttributeType, Attribute}) ->
       lists:member(string:to_integer(Attribute), lists:seq(0,2));
     "ageGroup" ->
       lists:member(string:to_integer(Attribute), lists:seq(0,6));
+    "hMcc" ->
+      true;
+    "hMnc" ->
+      true;
     _ ->
       false
   end.
@@ -99,6 +106,8 @@ testnumCheckValidAttribute([Element]) ->
       true;
     "clear" ->
       clear;
+    "period" ->
+      period;
     _ -> false
   end;
 testnumCheckValidAttribute({AttributeType, Attribute}) ->
@@ -112,7 +121,6 @@ testnumCheckValidAttribute({AttributeType, Attribute}) ->
     _ ->
       false
   end.
-
 checkValidNumber(Attribute,Min,Max) ->
   {Number, _} = string:to_integer(Attribute),
   if
@@ -122,6 +130,37 @@ checkValidNumber(Attribute,Min,Max) ->
 
 checkValidNumber2(Attribute,Min,Max) ->
 lists:member(Attribute, lists:seq(Min,Max)).
+
+
+
+periodSetup() ->
+  % period for IMSIstat 1000-3000
+  %start ={{Year,Month,Day},{Hours,Minutes,Seconds}
+  %stop = {{Year,Month,Day},{Hours,Minutes,Seconds}
+  startBreakPoint = io:get_line(io:format("Set start time for statistic break-point ~n")),
+  stopBreakPoint = io:get_line(io:format("Set start time for statistic break-point ~n")),
+  startInterval = io:get_line(io:format("Set start time for statistic break-point ~n")),
+  stopInterval = io:get_line(io:format("Set start time for inter ~n")),
+
+
+
+
+  % period for output freq = everey 5
+  %period start 1001
+  %period stop 2005
+  %function new output + restart the freq.
+
+  io:format("Statistics Break-point?"),
+  io:format("Statistics Segment~n"),
+  io:format("Output Frequency?~n"),
+  io:format("Output Perio?~n"),
+
+
+
+
+
+
+
 
 %checkValidAttribute(Attribute) ->
 %  checklist = string:tokens("zipCode,gender,ageGroup,done", ","),
