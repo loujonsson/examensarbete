@@ -9,7 +9,7 @@
 -author("lou").
 
 % For input file, storing all events in the mnesia database
--record(non_relational_event, {hashedImsi,reportingTs,reportingNode,eventTs,eventType,hMcc,hMnc,vMcc,vMnc,rat,cellName,gsmLac,gsmCid,umtsLac,umtsSac,umtsRncId,umtsCi,lteEnodeBId,lteCi,cellPortionId,locationEstimateShape,locationEstimateLat,locationEstimateLon,locationEstimateRadius,crmGender,crmAgeGroup,crmZipCode,presencePointId,groupPresencePointId}).
+-record(non_relational_event, {eventTs,hashedImsi,reportingTs,reportingNode,eventType,hMcc,hMnc,vMcc,vMnc,rat,cellName,gsmLac,gsmCid,umtsLac,umtsSac,umtsRncId,umtsCi,lteEnodeBId,lteCi,cellPortionId,locationEstimateShape,locationEstimateLat,locationEstimateLon,locationEstimateRadius,crmGender,crmAgeGroup,crmZipCode,presencePointId,groupPresencePointId}).
 
 % temp, remove later
 -record(lou_event, {hashedImsi,reportingTs,reportingNode,eventTs,eventType,hMcc,hMnc}).

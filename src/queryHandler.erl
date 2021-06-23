@@ -60,8 +60,8 @@ fetchEtsData(Name, LookupArg) ->
 % 'clear' means reset current query
 receiveValidCommand(Command) ->
   case Command of
-    otal -> ets:insert(attribute, {counterType, {"0"}});
-    unique -> ets:insert(attribute, {counterType, {"1"}});
+    total -> ets:insert(attributes, {counterType, {"0"}});
+    unique -> ets:insert(attributes, {counterType, {"1"}});
     done ->
       %Query = formatQuery(),
       getDataFromNonRelationalDb("lol", "hej"),
@@ -89,8 +89,6 @@ clearQuery() ->
 
 % sets new query attribute in ets table
 setNewAttributeQuery({AttributeType, Attribute}) ->
-  io:format(AttributeType),
-  io:format(Attribute),
   ets:insert(query, {AttributeType, {Attribute}}).
 
 
@@ -121,8 +119,14 @@ getElementsFromList([_| T]) ->
 
 % Searches for the selected AttributeType with attribute Attribute from database (nonrelational)
 getDataFromNonRelationalDb(AttributeType, Attribute) ->
-  UniqueHashedImsis = db:select_new(non_relational_event),
-  countOccurrences(UniqueHashedImsis).
+  ListOccurrences = case fetchEtsData(attributes, counterType) of
+    "0" -> db:select_total(non_relational_event);
+    "1" -> 
+      List = db:select_unique(non_relational_event),
+      Set = sets:from_list(List),
+      sets:to_list(Set)
+  end,
+  countOccurrences(ListOccurrences).
 
 
 % Searches for the selected AttributeType with attribute Attribute from database (relational)
@@ -135,6 +139,6 @@ getDataFromNonRelationalDb(AttributeType, Attribute) ->
 % count total occurrences and store in attributes ets table
 countOccurrences(Data) ->
   Length = length(Data),
-  TotalOccurrences = dataTypeConverter:integer_to_string(Length),
-  ets:insert(attributes, {counterValue, {TotalOccurrences}}).
+  Occurrences = dataTypeConverter:integer_to_string(Length),
+  ets:insert(attributes, {counterValue, {Occurrences}}).
 

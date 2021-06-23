@@ -10,7 +10,7 @@
 -author("lou").
 
 %% API
--export([install/1, write/29, write_dirty/29, write_testEvent/0, traverse_table_and_show/1, select/3,clearAllTables/0, select_new/1,fetchAttributesFromQuery/1]).
+-export([install/1, write/29, write_dirty/29, write_testEvent/0, traverse_table_and_show/1, select/3,clearAllTables/0, select_unique/1, select_total/1, fetchAttributesFromQuery/1]).
 -include("main.hrl").
 
 % configure database table in nonrelational database
@@ -94,10 +94,10 @@ write_dirty(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMc
 write(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId) ->
   F = fun() ->
     mnesia:write(#non_relational_event{
+      eventTs = EventTs,
       hashedImsi = HashedImsi,
       reportingTs = ReportingTs,
       reportingNode = ReportingNode,
-      eventTs = EventTs,
       eventType = EventType,
       hMcc = HMcc,
       hMnc = HMnc,
@@ -216,7 +216,8 @@ fetchAttributesFromQuery(Attribute) ->
   end.
   
 
-select_new(Table) ->
+% selects all unique imsis with the specified attributes from the query
+select_unique(Table) ->
   MatchHead = #non_relational_event{%reportingNode = '$1',
           %reportTs = '$2',
           %eventTs = '$3',
@@ -248,6 +249,42 @@ select_new(Table) ->
         },
         
   mnesia:dirty_select(Table, [{MatchHead, [], ['$6']}]).
+
+
+% selects total occurrences with the specified attributes from the query
+select_total(Table) ->
+  MatchHead = #non_relational_event{%reportingNode = '$1',
+          %reportingTs = '$2',
+          eventTs = '$3',
+          %eventType = '$4',
+          hMcc = fetchAttributesFromQuery("hMcc"),
+          hMnc = fetchAttributesFromQuery("hMnc"),
+          %hashedImsi = '$6',
+          %vMcc = '$7',
+          %vMnc = '$8',
+          %rat = '$9',
+          %cellName = '$10',
+          %gsmLac = '$11',
+          %gsmCid = '$12',
+          %umtsLac = '$12',
+          %umtsSac = '$13',
+          %umtsRncId = '$14',
+          %umtsCi = '$15',
+          %lteEnodeBId = '$16',
+          %lteCi = '$17',
+          %cellPortionId = '$18',
+          %locationEstimateShape = '$19',
+          %locationEstimateLat = '$20',
+          %locationEstimateLon = '$21',
+          %locationEstimateRadius = '$22',
+          crmGender = fetchAttributesFromQuery("gender"),
+          crmAgeGroup = fetchAttributesFromQuery("ageGroup"),
+          crmZipCode = fetchAttributesFromQuery("zipCode"),
+          _ = '_'
+        },
+        
+  mnesia:dirty_select(Table, [{MatchHead, [], ['$3']}]).
+
 
 
 
