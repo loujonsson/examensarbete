@@ -153,6 +153,9 @@ periodSetup() ->
   %stop = {{Year,Month,Day},{Hours,Minutes,Seconds}
   startBreakPoint = io:get_line(io:format("Set start time for statistic break-point ~n")),
   stopBreakPoint = io:get_line(io:format("Set start time for statistic break-point ~n")),
+
+  outputFilePeriodFrequency = io:get_line(io:format("Set Period Frequency ~n")),
+
   startInterval = io:get_line(io:format("Set start time for statistic break-point ~n")),
   stopInterval = io:get_line(io:format("Set start time for inter ~n")),
 
