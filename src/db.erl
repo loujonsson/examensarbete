@@ -296,7 +296,7 @@ select_total(Table) ->
           _ = '_'
         },
         
-  mnesia:dirty_select(Table, [{MatchHead, [], ['$3']}]).
+  mnesia:dirty_select(Table, [{MatchHead, [{'>', '$3', queryHandler:fetchEtsData(query, periodStartTs)},{'<', '$3', queryHandler:fetchEtsData(query, periodStopTs)}], ['$3']}]).
 
 
 

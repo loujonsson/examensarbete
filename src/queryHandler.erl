@@ -21,6 +21,9 @@
 % initializes query with an ets table
 queryInit() ->
   ets:new(query, [named_table, public, set, {keypos, 1}]).
+
+  %ets:insert(query, {periodStartTs, {0}}),
+  %ets:insert(query, {periodStopTs, {timeHandler:getNowTimeInUTC()}}).
   %ets:insert(query, {"gender", {}}), %{0,1,2}
   %ets:insert(query, {"ageGroup", {}}), %{0,1,2,3,4,5,6}
   %ets:insert(query, {"zipCode", {}}).

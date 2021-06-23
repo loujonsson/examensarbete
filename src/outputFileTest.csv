@@ -1,2 +1,2 @@
 reportingNode,reportTs,eventType,counterValue,counterType,periodStartTs,periodStopTs,statId,statIndex,presencePointId,presencePointIdType,minPresenceNo,hMcc,hMnc,crmGender,crmAgeGroup,crmZipCode,maxPresenceNo,presencePointId2,presencePointId2Type,minDwellTimeCrit,maxDwellTimeCrit,subCat,dayCat,timeCatCRLF
-reportingNode1,1624477447000000,3,4,1,0,1603069573000000,,,,,,,,,,,,,,,,,,,CLRF
+reportingNode1,1624481261000,3,4,1,0,1603069573000,,,,,,,,,,,,,,,,,,,CLRF

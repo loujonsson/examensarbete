@@ -29,6 +29,6 @@ getUniversalTimeNow() ->
 convertTime({{Year,Month,Day},{Hours,Minutes,Seconds}} = SpecifiedTime) ->
   TimeInMs=(calendar:datetime_to_gregorian_seconds(
     SpecifiedTime
-  ) - 62167219200)*1000000,
+  ) - 62167219200)*1000,
   TimeInMs.
 
