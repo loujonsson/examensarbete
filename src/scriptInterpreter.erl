@@ -153,7 +153,7 @@ periodSetup() ->
   io:format("Statistics Break-point?"),
   io:format("Statistics Segment~n"),
   io:format("Output Frequency?~n"),
-  io:format("Output Perio?~n"),
+  io:format("Output Perio?~n").
 
 
 
