@@ -194,6 +194,59 @@ select_gender(Gender) ->
           _ = '_'
         }.
 
+
+
+
+%%% Lous nya kod
+%%% Filtering attributes...
+
+
+receiveDone() ->
+  %fetchAttributesFromQuery(["presencePointId","presencePointIdType","minPresenceNo","hMcc","hMnc","gender","ageGroup","zipCode","maxPresenceNo","presencePointId2","presencePointId2Type","minDwellTimeCrit","maxDwellTimeCrit","subCat","dayCat","timeCat"]).
+  fetchAttributesFromQuery(["presencePointId","hMcc","hMnc","gender","ageGroup","zipCode"]).
+
+% TODO: Fix "" -> dont go to select
+% else -> go to select
+fetchAttributesFromQuery(Attribute) ->
+  if ets:lookup(query, Attribute) == "" ->
+    '_';
+  true -> queryHandler:fetchEtsData(H).
+  
+
+select_new() ->
+  #non_relational_event{%reportingNode = '$1',
+          %reportTs = '$2',
+          %eventTs = '$3',
+          %eventType = '$4',
+          hMcc = fetchAttributesFromQuery("hMcc"),
+          hMnc = fetchAttributesFromQuery("hMnc"),
+          hashedImsi = '$6',
+          %vMcc = '$7',
+          %vMnc = '$8',
+          %rat = '$9',
+          %cellName = '$10',
+          %gsmLac = '$11',
+          %gsmCid = '$12',
+          %umtsLac = '$12',
+          %umtsSac = '$13',
+          %umtsRncId = '$14',
+          %umtsCi = '$15',
+          %lteEnodeBId = '$16',
+          %lteCi = '$17',
+          %cellPortionId = '$18',
+          %locationEstimateShape = '$19',
+          %locationEstimateLat = '$20',
+          %locationEstimateLon = '$21',
+          %locationEstimateRadius = '$22',
+          crmGender = fetchAttributesFromQuery("gender"),
+          crmAgeGroup = fetchAttributesFromQuery("ageGroup"),
+          crmZipCode = fetchAttributesFromQuery("zipCode"),
+          _ = '_'
+        }.
+
+
+
+
 % QLC query list comprehensions
 %select_distinct(ZipCode) ->
 %  QH = qlc:q(
