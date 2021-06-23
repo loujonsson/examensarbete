@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 12. Apr 2021 14:57
 %%%-------------------------------------------------------------------
--module(db_nonrelational).
+-module(db).
 -author("lou").
 
 %% API
@@ -93,12 +93,10 @@ write_dirty(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMc
 % write to non relational db with transactions
 write(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId) ->
   F = fun() ->
-    %mnesia:write_lock_table(non_relational_event),
     mnesia:write(#non_relational_event{
       hashedImsi = HashedImsi,
       reportingTs = ReportingTs,
       reportingNode = ReportingNode,
-      
       eventTs = EventTs,
       eventType = EventType,
       hMcc = HMcc,
@@ -135,20 +133,6 @@ write(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc
 %    mnesia:write(Event)
 %  end,
 %  mnesia:activity(transaction, F).
-
-  % write to non relational db with transactions
-%write_mini(ReportingNode,EventType) ->
-%  io:format(ReportingNode),
-%  io:format("~n"),
-%  
-%  F = fun() ->
-%    mnesia:write(#mini_event{reportingNode = ReportingNode,
-%      eventType=EventType
-%    })
-%      end,
-%  mnesia:activity(transaction, F).
-  %timer:sleep(100).
-  %mnesia:info().
 
 % select from database depending on attribute type and attribute from user.
 select(Table_name, AttributeType, Attribute) ->
@@ -209,8 +193,6 @@ select_gender(Gender) ->
           crmZipCode = '$25',
           _ = '_'
         }.
-
-
 
 % QLC query list comprehensions
 %select_distinct(ZipCode) ->

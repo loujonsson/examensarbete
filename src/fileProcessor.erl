@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 08. Apr 2021 17:02
 %%%-------------------------------------------------------------------
--module(fileProcessor_nonrelational).
+-module(fileProcessor).
 -author("lou").
 
 %% API
@@ -102,7 +102,7 @@ parseData([ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc
   %    reportingTs = ReportingTs,
   %    hashedImsi = HashedImsi
   %  },
-  db_nonrelational:write_dirty(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId).
+  db:write_dirty(ReportingNode,ReportingTs,EventTs,EventType,HMcc,HMnc,HashedImsi,VMcc,VMnc,Rat,CellName,GsmLac,GsmCid,UmtsLac,UmtsSac,UmtsRncId,UmtsCi,LteEnodeBId,LteCi,CellPortionId,LocationEstimateShape,LocationEstimateLat,LocationEstimateLon,LocationEstimateRadius,CrmGender,CrmAgeGroup,CrmZipCode,PresencePointId,GroupPresencePointId).
 
 % writes event record to db
 %writeToDb(Event) -> db_nonrelational:write(Event).
